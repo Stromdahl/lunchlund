@@ -159,9 +159,15 @@ export function render(result: ScrapeResult): string {
         : `<div class="empty">Inga restauranger hittades.</div>`
     }
     <footer>
-      Källor:
-      <a href="https://brickseatery.se/" target="_blank" rel="noopener">brickseatery.se</a> ·
-      <a href="https://eatery.se/anlaggningar/lund" target="_blank" rel="noopener">eatery.se</a>
+      <div>
+        <a href="menus.json">JSON</a> ·
+        <a href="feed.xml">RSS</a>
+      </div>
+      <div style="margin-top:6px">
+        Källor:
+        <a href="https://brickseatery.se/" target="_blank" rel="noopener">brickseatery.se</a> ·
+        <a href="https://eatery.se/anlaggningar/lund" target="_blank" rel="noopener">eatery.se</a>
+      </div>
     </footer>
   </main>
 </body>

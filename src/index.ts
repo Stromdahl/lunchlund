@@ -2,6 +2,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { scrapeAll } from "./scrape";
 import { render } from "./render";
+import { renderJson, renderRss } from "./feeds";
 
 type Args = { outDir: string };
 
@@ -42,12 +43,19 @@ async function main() {
     console.error(`  ${e.source}: FAILED — ${e.error}`);
   }
 
-  const html = render(result);
   const outDir = resolve(process.cwd(), args.outDir);
   await mkdir(outDir, { recursive: true });
-  const outFile = resolve(outDir, "index.html");
-  await writeFile(outFile, html, "utf8");
-  console.error(`wrote ${outFile}`);
+
+  const files: [string, string][] = [
+    ["index.html", render(result)],
+    ["menus.json", renderJson(result)],
+    ["feed.xml", renderRss(result)],
+  ];
+  for (const [name, body] of files) {
+    const p = resolve(outDir, name);
+    await writeFile(p, body, "utf8");
+    console.error(`wrote ${p}`);
+  }
 }
 
 main().catch((err) => {
