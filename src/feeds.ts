@@ -1,6 +1,9 @@
 import { ScrapeResult, Restaurant, DayMenu } from "./types";
 
-const BASE_URL = "https://stromdahl.github.io/lunchlund";
+// HTML page lives on the project Pages site; feeds are mirrored to the
+// user-level Pages site so the canonical URLs are short.
+const PAGE_URL = "https://stromdahl.github.io/lunchlund";
+const FEED_BASE = "https://stromdahl.github.io";
 const WEEKDAYS = ["Måndag", "Tisdag", "Onsdag", "Torsdag", "Fredag"];
 
 export function renderJson(result: ScrapeResult): string {
@@ -29,8 +32,8 @@ export function renderRss(result: ScrapeResult): string {
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Lunch nära Mobilvägen 10</title>
-    <link>${BASE_URL}/</link>
-    <atom:link href="${BASE_URL}/lunchlund.xml" rel="self" type="application/rss+xml" />
+    <link>${PAGE_URL}/</link>
+    <atom:link href="${FEED_BASE}/lunchlund.xml" rel="self" type="application/rss+xml" />
     <description>Veckans luncher för restaurangerna närmast Mobilvägen 10, Lund.</description>
     <language>sv</language>
     <lastBuildDate>${lastBuild}</lastBuildDate>
@@ -62,7 +65,7 @@ function buildItem(
 
   const xml = `    <item>
       <title>${escapeXml(title)}</title>
-      <link>${BASE_URL}/#${slug}</link>
+      <link>${PAGE_URL}/#${slug}</link>
       <guid isPermaLink="false">${guid}</guid>
       <pubDate>${date.toUTCString()}</pubDate>
       <description>${escapeXml(descHtml)}</description>
