@@ -48,8 +48,8 @@ async function main() {
 
   const files: [string, string][] = [
     ["index.html", render(result)],
-    ["menus.json", renderJson(result)],
-    ["feed.xml", renderRss(result)],
+    ["lunchlund.json", renderJson(result)],
+    ["lunchlund.xml", renderRss(result)],
   ];
   for (const [name, body] of files) {
     const p = resolve(outDir, name);

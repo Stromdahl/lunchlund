@@ -30,7 +30,7 @@ export function renderRss(result: ScrapeResult): string {
   <channel>
     <title>Lunch nära Mobilvägen 10</title>
     <link>${BASE_URL}/</link>
-    <atom:link href="${BASE_URL}/feed.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="${BASE_URL}/lunchlund.xml" rel="self" type="application/rss+xml" />
     <description>Veckans luncher för restaurangerna närmast Mobilvägen 10, Lund.</description>
     <language>sv</language>
     <lastBuildDate>${lastBuild}</lastBuildDate>

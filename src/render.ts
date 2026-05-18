@@ -160,8 +160,8 @@ export function render(result: ScrapeResult): string {
     }
     <footer>
       <div>
-        <a href="menus.json">JSON</a> ·
-        <a href="feed.xml">RSS</a>
+        <a href="lunchlund.json">JSON</a> ·
+        <a href="lunchlund.xml">RSS</a>
       </div>
       <div style="margin-top:6px">
         Källor:
