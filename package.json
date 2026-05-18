@@ -1,0 +1,21 @@
+{
+  "name": "lunchlund",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Scrapes lunch menus near Mobilvägen 10, Lund and emits a static HTML page.",
+  "main": "dist/index.js",
+  "packageManager": "yarn@4.14.1",
+  "scripts": {
+    "build": "ts-node src/index.ts",
+    "compile": "tsc",
+    "start": "ts-node src/index.ts"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.0"
+  }
+}
