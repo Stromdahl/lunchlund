@@ -1,22 +1,24 @@
 import { Restaurant, ScrapeResult } from "./types";
-import { formatInterval, stockholmDayAndTime } from "./hours";
+import {
+  formatInterval,
+  stockholmDayAndTime,
+  translateDay,
+  weekdayName,
+} from "./hours";
 
-const WEEKDAYS = ["Måndag", "Tisdag", "Onsdag", "Torsdag", "Fredag"];
-
-function todayName(d: Date = new Date()): string | null {
-  const idx = d.getDay(); // 0=Sun … 6=Sat
-  if (idx < 1 || idx > 5) return null;
-  return WEEKDAYS[idx - 1];
+function todayKey(d: Date) {
+  return stockholmDayAndTime(d).day;
 }
 
 function fmtFetched(d: Date): string {
-  return d.toLocaleString("sv-SE", {
+  return d.toLocaleString("en-GB", {
     timeZone: "Europe/Stockholm",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
+    hour12: false,
   });
 }
 
@@ -30,38 +32,40 @@ function escapeHtml(s: string): string {
 
 function renderRestaurant(
   r: Restaurant,
-  today: string | null,
+  todaySwedish: string | null,
   fetchedAt: Date,
 ): string {
-  const todayBlock = today
-    ? r.menu.find((m) => m.day.toLowerCase() === today.toLowerCase())
+  const todayBlock = todaySwedish
+    ? r.menu.find((m) => m.day.toLowerCase() === todaySwedish.toLowerCase())
     : null;
   const otherDays = r.menu.filter((m) => m !== todayBlock);
 
   const dayKey = stockholmDayAndTime(fetchedAt).day;
   const todayHours = r.hours?.[dayKey] ?? [];
   const hoursText = todayHours.length
-    ? "Idag " + todayHours.map(formatInterval).join(", ")
-    : "Stängt idag";
+    ? "Today " + todayHours.map(formatInterval).join(", ")
+    : "Closed today";
   const hoursAttr = r.hours
     ? ` data-hours="${escapeHtml(JSON.stringify(r.hours))}"`
     : "";
 
   const todayHtml = todayBlock
     ? `<div class="today">
-        <div class="day-label">Idag · ${escapeHtml(todayBlock.day)}</div>
+        <div class="day-label">Today · ${escapeHtml(translateDay(todayBlock.day))}</div>
         <ul>${todayBlock.lines.map((l) => `<li>${escapeHtml(l)}</li>`).join("")}</ul>
       </div>`
     : `<div class="empty-day">${
-        today ? `Ingen meny för ${escapeHtml(today)}.` : "Helg — visar veckans meny nedan."
+        todaySwedish
+          ? `No menu for ${escapeHtml(weekdayName(dayKey))}.`
+          : "Weekend — showing the week's menus below."
       }</div>`;
 
   const restHtml = otherDays.length
-    ? `<details${today ? "" : " open"}><summary>Resten av veckan</summary>
+    ? `<details${todaySwedish ? "" : " open"}><summary>Rest of the week</summary>
         ${otherDays
           .map(
             (d) => `<div class="day">
-              <div class="day-label">${escapeHtml(d.day)}</div>
+              <div class="day-label">${escapeHtml(translateDay(d.day))}</div>
               <ul>${d.lines.map((l) => `<li>${escapeHtml(l)}</li>`).join("")}</ul>
             </div>`,
           )
@@ -70,7 +74,7 @@ function renderRestaurant(
     : "";
 
   const link = r.website
-    ? `<a class="site" href="${escapeHtml(r.website)}" target="_blank" rel="noopener">webbplats ↗</a>`
+    ? `<a class="site" href="${escapeHtml(r.website)}" target="_blank" rel="noopener">website ↗</a>`
     : "";
 
   const note = r.note ? `<span class="note">${escapeHtml(r.note)}</span>` : "";
@@ -90,13 +94,17 @@ function renderRestaurant(
 }
 
 export function render(result: ScrapeResult): string {
-  const today = todayName(result.fetchedAt);
+  const tk = todayKey(result.fetchedAt);
+  const isWeekend = tk === "sat" || tk === "sun";
+  // Swedish "Måndag" etc. is what scrapers stamp on each DayMenu; use the same
+  // value for matching today's menu, then translate for display.
+  const todaySwedish = isWeekend ? null : capitalizeSwedishDay(tk);
   const cards = result.restaurants
-    .map((r) => renderRestaurant(r, today, result.fetchedAt))
+    .map((r) => renderRestaurant(r, todaySwedish, result.fetchedAt))
     .join("\n");
   const errorList = result.errors.length
     ? `<div class="errors">
-        <strong>Vissa källor misslyckades:</strong>
+        <strong>Some sources failed:</strong>
         <ul>${result.errors
           .map(
             (e) => `<li>${escapeHtml(e.source)}: ${escapeHtml(e.error)}</li>`,
@@ -106,11 +114,11 @@ export function render(result: ScrapeResult): string {
     : "";
 
   return `<!doctype html>
-<html lang="sv">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Lunch nära Mobilvägen 10</title>
+  <title>Lunch near Mobilvägen 10</title>
   <style>
     :root {
       --bg: #fafaf7;
@@ -176,15 +184,13 @@ export function render(result: ScrapeResult): string {
 </head>
 <body>
   <main class="wrap">
-    <h1>Lunch nära Mobilvägen 10</h1>
-    <div class="sub">Uppdaterad ${escapeHtml(fmtFetched(result.fetchedAt))}${
-    today ? ` · ${escapeHtml(today)}` : " · helg"
-  }</div>
+    <h1>Lunch near Mobilvägen 10</h1>
+    <div class="sub">Updated ${escapeHtml(fmtFetched(result.fetchedAt))} · ${escapeHtml(weekdayName(tk))}</div>
     ${errorList}
     ${
       result.restaurants.length
         ? cards
-        : `<div class="empty">Inga restauranger hittades.</div>`
+        : `<div class="empty">No restaurants found.</div>`
     }
     <footer>
       <div>
@@ -192,9 +198,12 @@ export function render(result: ScrapeResult): string {
         <a href="https://stromdahl.github.io/lunchlund.xml">RSS</a>
       </div>
       <div style="margin-top:6px">
-        Källor:
+        Sources:
         <a href="https://brickseatery.se/" target="_blank" rel="noopener">brickseatery.se</a> ·
-        <a href="https://eatery.se/anlaggningar/lund" target="_blank" rel="noopener">eatery.se</a>
+        <a href="https://eatery.se/anlaggningar/lund" target="_blank" rel="noopener">eatery.se</a> ·
+        <a href="https://www.kantinlund.se/" target="_blank" rel="noopener">kantinlund.se</a> ·
+        <a href="https://restaurangedison.se/" target="_blank" rel="noopener">restaurangedison.se</a> ·
+        <a href="https://restauranginspira.se/" target="_blank" rel="noopener">restauranginspira.se</a>
       </div>
     </footer>
   </main>
@@ -216,18 +225,18 @@ export function render(result: ScrapeResult): string {
       var badge = card.querySelector(".badge");
       var line = card.querySelector(".hours-today");
       var today = hours[dow] || [];
-      if (line) line.textContent = today.length ? "Idag " + today.map(fmtInterval).join(", ") : "Stängt idag";
+      if (line) line.textContent = today.length ? "Today " + today.map(fmtInterval).join(", ") : "Closed today";
       if (!badge) return;
       var openNow = today.find(function (i) {
         return nowMin >= toMin(i.open) && nowMin < toMin(i.close);
       });
       if (openNow) {
-        badge.textContent = "Öppet nu";
+        badge.textContent = "Open now";
         badge.classList.add("open");
         return;
       }
       var next = today.find(function (i) { return toMin(i.open) > nowMin; });
-      badge.textContent = next ? "Öppnar " + next.open : "Stängt";
+      badge.textContent = next ? "Opens " + next.open : "Closed";
       badge.classList.add("closed");
     });
   })();
@@ -235,4 +244,18 @@ export function render(result: ScrapeResult): string {
 </body>
 </html>
 `;
+}
+
+const SWEDISH_DAY_BY_KEY: Record<string, string> = {
+  mon: "Måndag",
+  tue: "Tisdag",
+  wed: "Onsdag",
+  thu: "Torsdag",
+  fri: "Fredag",
+  sat: "Lördag",
+  sun: "Söndag",
+};
+
+function capitalizeSwedishDay(key: string): string {
+  return SWEDISH_DAY_BY_KEY[key] ?? "";
 }
