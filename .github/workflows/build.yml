@@ -4,9 +4,11 @@ on:
   push:
     branches: [main]
   schedule:
-    # Mon–Fri at 05:23 UTC. Off-the-hour to avoid GitHub's high-contention
-    # cron slots — :00 ticks routinely skip on the free runner pool.
-    - cron: "23 5 * * 1-5"
+    # Mon–Fri at 07:23 Stockholm time. Off-the-hour to avoid GitHub's
+    # high-contention cron slots — :00 ticks routinely skip on the free
+    # runner pool.
+    - cron: "23 7 * * 1-5"
+      timezone: "Europe/Stockholm"
   workflow_dispatch:
 
 permissions:
@@ -31,7 +33,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
 
       - name: Enable Corepack
         run: corepack enable
