@@ -21,6 +21,9 @@ export type Restaurant = {
   website?: string;
   /** Free-form annotation shown under the name (e.g. "Lunchmeny V21"). */
   note?: string;
+  /** Free-form lunch price as published by the site, e.g. "115:-",
+   *  "139kr (early-bird 132 kr 11:00–11:30)", "149–159kr". */
+  price?: string;
   menu: DayMenu[];
   hours?: WeeklyHours;
 };

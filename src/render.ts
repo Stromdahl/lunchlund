@@ -90,11 +90,14 @@ function renderRestaurant(
     : "";
 
   const note = r.note ? `<span class="note">${escapeHtml(r.note)}</span>` : "";
+  const priceChip = r.price
+    ? ` <span class="price">${escapeHtml(r.price)}</span>`
+    : "";
 
   return `<article class="restaurant"${hoursAttr}>
     <header>
       <h2>${escapeHtml(r.name)} ${note}</h2>
-      <div class="meta">${escapeHtml(r.address)} ${link}</div>
+      <div class="meta">${escapeHtml(r.address)}${priceChip} ${link}</div>
       <div class="hours-line">
         <span class="hours-today">${escapeHtml(hoursText)}</span>
         <span class="badge" aria-live="polite"></span>
@@ -158,6 +161,15 @@ export function render(result: ScrapeResult): string {
     .meta { color: var(--muted); font-size: 13px; margin-bottom: 4px; }
     .meta .site { margin-left: 8px; color: var(--accent); text-decoration: none; }
     .meta .site:hover { text-decoration: underline; }
+    .meta .price {
+      display: inline-block;
+      margin-left: 6px;
+      padding: 1px 7px;
+      font-size: 12px;
+      border-radius: 999px;
+      background: #f0ece4;
+      color: #4a3a1f;
+    }
     .hours-line { font-size: 13px; color: var(--muted); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .badge {
       display: inline-block; font-size: 12px; padding: 2px 8px; border-radius: 999px;

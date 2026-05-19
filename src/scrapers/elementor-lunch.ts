@@ -34,6 +34,17 @@ export async function scrapeElementorLunch(
 
   const note = $(".week").first().text().replace(/\s+/g, " ").trim() || undefined;
 
+  // The Elementor "lunchmeny" shortcode prints a .lunch_price per dish. Bricks
+  // and Edison fill it with a single uniform price; Inspira leaves it blank.
+  let price: string | undefined;
+  $(".lunch_price").each((_, el) => {
+    const t = $(el).text().replace(/\s+/g, " ").trim();
+    if (t) {
+      price = t;
+      return false;
+    }
+  });
+
   const menu: DayMenu[] = [];
   for (const { day, cls } of DAY_CLASSES) {
     const lines: string[] = [];
@@ -56,6 +67,7 @@ export async function scrapeElementorLunch(
     address: opts.address,
     website: opts.url,
     note,
+    price,
     menu,
     hours: opts.hours,
   };

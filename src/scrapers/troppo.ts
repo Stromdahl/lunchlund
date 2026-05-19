@@ -26,6 +26,17 @@ export async function scrapeTroppo(): Promise<Restaurant> {
     }
   });
 
+  // The price is a short <p> like "Lunch 149-159kr" right under the h1.
+  let price: string | undefined;
+  $("p").each((_, p) => {
+    const t = $(p).text().replace(/[​-‍﻿]/g, "").replace(/\s+/g, " ").trim();
+    const m = t.match(/^Lunch\s+([\d]+(?:\s*[-–]\s*\d+)?\s*kr)$/i);
+    if (m) {
+      price = m[1].replace(/\s*[-–]\s*/, "–").replace(/\s+/g, "");
+      return false;
+    }
+  });
+
   // The menu lives in a .rich-text block somewhere after the "Monday-Friday"
   // h2 — usually nested one level inside the next sibling wrapper.
   let container = $();
@@ -65,6 +76,7 @@ export async function scrapeTroppo(): Promise<Restaurant> {
     address: "Brunnshögsgatan 34, Lund",
     website: URL,
     note,
+    price,
     menu,
     hours: weekdayLunch("11:00", "14:00"),
   };

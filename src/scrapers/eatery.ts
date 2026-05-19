@@ -16,7 +16,7 @@ const DAY_DISPLAY: Record<string, string> = {
 };
 
 export async function scrapeEatery(): Promise<Restaurant> {
-  const pdfUrl = await findCurrentPdfUrl();
+  const { pdfUrl, price } = await scrapeLandingPage();
   const pdf = await fetchPdf(pdfUrl);
   const text = await pdfToText(pdf);
   const { menu, week } = parseMenu(text);
@@ -26,12 +26,16 @@ export async function scrapeEatery(): Promise<Restaurant> {
     address: "Mobilvägen 4, Lund",
     website: PAGE_URL,
     note: week,
+    price,
     menu,
     hours: HOURS,
   };
 }
 
-async function findCurrentPdfUrl(): Promise<string> {
+async function scrapeLandingPage(): Promise<{
+  pdfUrl: string;
+  price?: string;
+}> {
   const res = await fetch(PAGE_URL, {
     headers: { "user-agent": "lunchlund/0.1 (+local tool)" },
   });
@@ -48,7 +52,33 @@ async function findCurrentPdfUrl(): Promise<string> {
     }
   });
   if (!pdfUrl) throw new Error("eatery: no Lund_sv_V*.pdf link found on page");
-  return pdfUrl;
+
+  // The lunch section lists two prices in adjacent <p>'s:
+  //   "11:00 - 11:30 (Early-bird)\n132kr"
+  //   "11:00 - 14:00 (ordinarie)\n139kr"
+  // We join into one display string.
+  const pricePairs: { time: string; amount: string }[] = [];
+  $("p").each((_, p) => {
+    const t = $(p).text().replace(/\s+/g, " ").trim();
+    const m = t.match(/(\d{1,2}[:.]\d{2}\s*[-–]\s*\d{1,2}[:.]\d{2})\s*\(([^)]+)\)\s*(\d{2,3}\s*kr)/i);
+    if (m) {
+      pricePairs.push({
+        time: `${m[1]} (${m[2].trim()})`,
+        amount: m[3].replace(/\s+/g, ""),
+      });
+    }
+  });
+  let price: string | undefined;
+  if (pricePairs.length) {
+    const ordinarie = pricePairs.find((p) => /ordinarie/i.test(p.time));
+    const earlyBird = pricePairs.find((p) => /early-?bird/i.test(p.time));
+    const base = ordinarie ?? pricePairs[0];
+    price = earlyBird && earlyBird !== base
+      ? `${base.amount} (early-bird ${earlyBird.amount} ${earlyBird.time.replace(/\s*\(.*$/, "")})`
+      : base.amount;
+  }
+
+  return { pdfUrl, price };
 }
 
 async function fetchPdf(url: string): Promise<Buffer> {
