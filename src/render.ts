@@ -194,7 +194,10 @@ export function render(result: ScrapeResult): string {
       <div style="margin-top:6px">
         Källor:
         <a href="https://brickseatery.se/" target="_blank" rel="noopener">brickseatery.se</a> ·
-        <a href="https://eatery.se/anlaggningar/lund" target="_blank" rel="noopener">eatery.se</a>
+        <a href="https://eatery.se/anlaggningar/lund" target="_blank" rel="noopener">eatery.se</a> ·
+        <a href="https://www.kantinlund.se/" target="_blank" rel="noopener">kantinlund.se</a> ·
+        <a href="https://restaurangedison.se/" target="_blank" rel="noopener">restaurangedison.se</a> ·
+        <a href="https://restauranginspira.se/" target="_blank" rel="noopener">restauranginspira.se</a>
       </div>
     </footer>
   </main>
