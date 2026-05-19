@@ -1,5 +1,4 @@
 import { ScrapeResult, Restaurant, DayMenu } from "./types";
-import { translateDay } from "./hours";
 
 // HTML page lives on the project Pages site; feeds are mirrored to the
 // user-level Pages site so the canonical URLs are short.
@@ -32,11 +31,11 @@ export function renderRss(result: ScrapeResult): string {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Lunch near Mobilvägen 10</title>
+    <title>Lunch nära Mobilvägen 10</title>
     <link>${PAGE_URL}/</link>
     <atom:link href="${FEED_BASE}/lunchlund.xml" rel="self" type="application/rss+xml" />
-    <description>Weekly lunch menus for restaurants nearest Mobilvägen 10, Lund.</description>
-    <language>en</language>
+    <description>Veckans luncher för restaurangerna närmast Mobilvägen 10, Lund.</description>
+    <language>sv</language>
     <lastBuildDate>${lastBuild}</lastBuildDate>
 ${itemsXml}
   </channel>
@@ -62,7 +61,7 @@ function buildItem(
   const descHtml = `<ul>${day.lines
     .map((l) => `<li>${escapeXml(l)}</li>`)
     .join("")}</ul>`;
-  const title = `${restaurant.name} — ${translateDay(day.day)}`;
+  const title = `${restaurant.name} — ${day.day}`;
 
   const xml = `    <item>
       <title>${escapeXml(title)}</title>

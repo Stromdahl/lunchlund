@@ -10,26 +10,14 @@ export const WEEKDAY_KEYS: WeekdayKey[] = [
   "sun",
 ];
 
-const WEEKDAY_NAMES_EN: Record<WeekdayKey, string> = {
-  mon: "Monday",
-  tue: "Tuesday",
-  wed: "Wednesday",
-  thu: "Thursday",
-  fri: "Friday",
-  sat: "Saturday",
-  sun: "Sunday",
-};
-
-// Map the Swedish day labels that the scrapers extract (Måndag, Tisdag, …)
-// back to their WeekdayKey so the renderer can translate them.
-const SV_TO_KEY: Record<string, WeekdayKey> = {
-  måndag: "mon",
-  tisdag: "tue",
-  onsdag: "wed",
-  torsdag: "thu",
-  fredag: "fri",
-  lördag: "sat",
-  söndag: "sun",
+const WEEKDAY_NAMES_SV: Record<WeekdayKey, string> = {
+  mon: "Måndag",
+  tue: "Tisdag",
+  wed: "Onsdag",
+  thu: "Torsdag",
+  fri: "Fredag",
+  sat: "Lördag",
+  sun: "Söndag",
 };
 
 /** Convenience: same lunch interval on weekdays, closed weekends. */
@@ -47,14 +35,7 @@ export function weekdayLunch(open: string, close: string): WeeklyHours {
 }
 
 export function weekdayName(key: WeekdayKey): string {
-  return WEEKDAY_NAMES_EN[key];
-}
-
-/** Translate a Swedish day label (as scraped) to English. Returns the input
- *  unchanged if no mapping is known (e.g. "Veckans"). */
-export function translateDay(swedish: string): string {
-  const key = SV_TO_KEY[swedish.trim().toLowerCase()];
-  return key ? WEEKDAY_NAMES_EN[key] : swedish;
+  return WEEKDAY_NAMES_SV[key];
 }
 
 /** Extract day-of-week + HH:MM in Europe/Stockholm from a Date. */
