@@ -134,19 +134,30 @@ function renderWeekDay(day: string, lines: string[]): string {
 
 function renderCard(r: Restaurant, todayKey: WeekdayKey): string {
   const wholeWeek = isWholeWeekMenu(r);
+  const isWeekend = todayKey === "sat" || todayKey === "sun";
   const todayName = DAY_NAMES[todayKey];
+
+  // Today's menu entry: whole-week takes the lone entry; weekdays match by
+  // Swedish day name; weekends have no "today" — the disclosure carries the
+  // full week instead.
   const todayEntry = wholeWeek
     ? r.menu[0]
-    : (r.menu.find((m) => m.day === todayName) ?? r.menu[0]);
+    : isWeekend
+      ? null
+      : (r.menu.find((m) => m.day === todayName) ?? null);
   const restOfWeek = wholeWeek
     ? []
     : r.menu.filter((m) => m !== todayEntry);
   const todayLines = todayEntry?.lines ?? [];
   const todayHrs = hoursTodayLabel(r.hours, todayKey);
 
-  const note = r.note
-    ? `<span class="note">${esc(r.note)}</span>`
-    : "";
+  // SSR initial pill state — JS will refine at view time. On weekends or
+  // closed days we render "Stängt idag" so the JS-off case is honest.
+  const slots = r.hours?.[todayKey] ?? [];
+  const initialPillCls = slots.length ? "open" : "closed";
+  const initialPillText = slots.length ? "Öppet nu" : "Stängt idag";
+
+  const note = r.note ? `<span class="note">${esc(r.note)}</span>` : "";
   const price = r.price
     ? `<span class="price">${esc(r.price)}</span>`
     : "";
@@ -154,18 +165,27 @@ function renderCard(r: Restaurant, todayKey: WeekdayKey): string {
     ? `<a href="${esc(r.website)}" rel="noopener">webbplats ↗</a>`
     : "";
 
-  const idagStrip = wholeWeek
-    ? `<div class="idag"><span>HELA VECKAN</span></div>`
-    : `<div class="idag"><span>IDAG</span><span class="sep">·</span><span class="day">${esc(
-        todayName.toUpperCase(),
-      )}</span></div>`;
+  // The IDAG/HELA VECKAN strip now lives inside .when (same row as hours +
+  // pill). On weekend builds the left side is empty; hours and pill float
+  // right via margin-left:auto on .hours.
+  const leftLabel = wholeWeek
+    ? `<span>HELA VECKAN</span>`
+    : isWeekend
+      ? ""
+      : `<span>IDAG</span><span class="sep">·</span><span class="day">${esc(
+          todayName.toUpperCase(),
+        )}</span>`;
 
   const wholeWeekBanner = wholeWeek
     ? `<p class="wholeweek">Samma meny mån–fre.</p>`
     : "";
 
+  const itemsBlock = todayLines.length
+    ? `<ul class="items">${todayLines.map(renderItem).join("")}</ul>`
+    : "";
+
   const disclosure = restOfWeek.length
-    ? `<details class="week"><summary>Resten av veckan</summary>${restOfWeek
+    ? `<details class="week"${isWeekend ? " open" : ""}><summary>Resten av veckan</summary>${restOfWeek
         .map((d) => renderWeekDay(d.day, d.lines))
         .join("")}</details>`
     : "";
@@ -181,12 +201,12 @@ function renderCard(r: Restaurant, todayKey: WeekdayKey): string {
       ${web}
     </div>
     <div class="when">
-      <span class="hours"><span class="lab">Idag</span><span data-today-hours>${esc(todayHrs)}</span></span>
-      <span class="pill open" data-state-pill><span class="dot"></span>Öppet nu</span>
+      ${leftLabel}
+      <span class="hours" data-today-hours>${esc(todayHrs)}</span>
+      <span class="pill ${initialPillCls}" data-state-pill><span class="dot"></span>${initialPillText}</span>
     </div>
-    ${idagStrip}
     ${wholeWeekBanner}
-    <ul class="items">${todayLines.map(renderItem).join("")}</ul>
+    ${itemsBlock}
     ${disclosure}
   </li>`;
 }
@@ -230,55 +250,53 @@ function renderErrorCard(
 const CSS = `:root{--paper-0:oklch(97% 0.003 90);--paper-1:oklch(99% 0.002 90);--paper-2:oklch(93% 0.004 90);--ink:oklch(14% 0 0);--ink-2:oklch(42% 0 0);--ink-3:oklch(62% 0 0);--hair:oklch(86% 0.003 90);--rule:oklch(78% 0.004 90);--accent:oklch(14% 0 0);--accent-soft:oklch(92% 0.003 90);--ok:oklch(50% 0.12 145);--ok-soft:oklch(93% 0.04 145);--bad:oklch(52% 0.16 25);--bad-soft:oklch(93% 0.04 25);--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,'Helvetica Neue',Arial,sans-serif;--radius:14px}
 *,*::before,*::after{box-sizing:border-box}
 html{background:var(--paper-0)}
-body{margin:0;background:var(--paper-0);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased;letter-spacing:-.005em;font-feature-settings:'ss01' 1}
+body{margin:0;background:var(--paper-0);color:var(--ink);font-family:var(--sans);font-size:14.5px;line-height:1.4;-webkit-font-smoothing:antialiased;letter-spacing:-.005em;font-feature-settings:'ss01' 1}
 .page{max-width:720px;margin:0 auto;padding:0 20px 48px}
 a{color:var(--ink);text-decoration-color:var(--hair);text-decoration-thickness:1px;text-underline-offset:3px}
 a:hover{text-decoration-color:var(--ink);color:var(--ink)}
 a:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:3px}
-.top{padding:36px 0 14px}
-.top h1{font-size:clamp(28px,7vw,38px);font-weight:800;letter-spacing:-.025em;line-height:1.05;margin:0 0 8px}
+.top{padding:28px 0 12px}
+.top h1{font-size:clamp(26px,6.5vw,34px);font-weight:800;letter-spacing:-.025em;line-height:1.05;margin:0 0 6px}
 .top h1 .accent{color:var(--accent)}
 .top .dateline{font-size:13.5px;color:var(--ink-2);display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}
 .top .dateline .sep{color:var(--ink-3)}
 .top .dateline .live{display:inline-flex;align-items:center;gap:6px;color:var(--ink);font-weight:500}
 .top .dateline .live .dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px var(--ok-soft)}
-.cards{margin:14px 0 0;display:flex;flex-direction:column;gap:16px;list-style:none;padding:0}
-.card{background:var(--paper-1);border:1px solid var(--hair);border-radius:var(--radius);padding:18px 18px 16px;box-shadow:0 1px 0 oklch(100% 0 0 / .5) inset,0 1px 2px oklch(14% 0 0 / .04),0 8px 28px -20px oklch(14% 0 0 / .15)}
+.cards{margin:12px 0 0;display:flex;flex-direction:column;gap:10px;list-style:none;padding:0}
+.card{background:var(--paper-1);border:1px solid var(--hair);border-radius:var(--radius);padding:14px 14px 12px;box-shadow:0 1px 0 oklch(100% 0 0 / .5) inset,0 1px 2px oklch(14% 0 0 / .04),0 6px 20px -16px oklch(14% 0 0 / .18)}
 .head{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin:0}
-.name{font-size:22px;font-weight:700;letter-spacing:-.015em;line-height:1.15;margin:0;color:var(--ink)}
-.note{font-size:12.5px;font-weight:500;color:var(--ink-3);letter-spacing:.02em;padding:2px 7px;border-radius:6px;background:var(--paper-2)}
-.meta{margin:8px 0 0;display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;font-size:13.5px;color:var(--ink-2)}
-.meta .price{font-size:12.5px;font-weight:600;color:var(--ink);padding:2px 7px;border-radius:6px;background:var(--accent-soft);letter-spacing:-.005em}
+.name{font-size:19px;font-weight:700;letter-spacing:-.015em;line-height:1.1;margin:0;color:var(--ink)}
+.note{font-size:11.5px;font-weight:500;color:var(--ink-3);letter-spacing:.02em;padding:1px 6px;border-radius:5px;background:var(--paper-2)}
+.meta{margin:4px 0 0;display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px;font-size:12.5px;color:var(--ink-2)}
+.meta .price{font-size:11.5px;font-weight:600;color:var(--ink);padding:1px 6px;border-radius:5px;background:var(--accent-soft);letter-spacing:-.005em}
 .meta a{font-weight:500}
-.when{margin:12px 0 0;display:flex;align-items:center;gap:10px;font-size:14px}
-.when .hours{font-feature-settings:'tnum' 1;font-weight:600;color:var(--ink)}
-.when .hours .lab{color:var(--ink-3);font-weight:500;margin-right:6px;text-transform:lowercase;letter-spacing:-.005em}
-.pill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:11.5px;font-weight:600;letter-spacing:.02em}
-.pill .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.when{margin:10px 0 4px;padding:3px 0 3px 9px;border-left:3px solid var(--accent);display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.when .day{color:var(--ink)}
+.when .sep{color:var(--ink-3);font-weight:600}
+.when .hours{font-feature-settings:'tnum' 1;font-weight:600;color:var(--ink);letter-spacing:-.005em;text-transform:none;font-size:13px;margin-left:auto}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:999px;font-size:10.5px;font-weight:600;letter-spacing:.02em;text-transform:none}
+.pill .dot{width:5px;height:5px;border-radius:50%;background:currentColor}
 .pill.open{background:var(--ok-soft);color:var(--ok)}
 .pill.closed,.pill.opens{background:var(--paper-2);color:var(--ink-2)}
 .pill.error{background:var(--bad-soft);color:var(--bad)}
-.idag{margin:16px 0 6px;padding:4px 0 4px 10px;border-left:3px solid var(--accent);font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:8px}
-.idag .sep{color:var(--ink-3);font-weight:600}
-.idag .day{color:var(--ink)}
-.items{margin:4px 0 0;padding:0 0 0 14px;list-style:none}
-.item{position:relative;padding:6px 0;font-size:14.5px;line-height:1.45;color:var(--ink);text-wrap:pretty}
-.item::before{content:'';position:absolute;left:-12px;top:13px;width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.items{margin:2px 0 0;padding:0 0 0 13px;list-style:none}
+.item{position:relative;padding:3px 0;font-size:13.5px;line-height:1.4;color:var(--ink);text-wrap:pretty}
+.item::before{content:'';position:absolute;left:-11px;top:10px;width:4px;height:4px;border-radius:50%;background:var(--accent)}
 .item .tag{font-weight:700;color:var(--ink);margin-right:4px}
 .item .tag::after{content:':';margin-right:4px;color:var(--ink-3)}
 .item.no-tag .tag{display:none}
-.wholeweek{margin:8px 0 0;font-size:12.5px;color:var(--ink-2);font-style:italic}
-.week{margin-top:12px}
-.week>summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:6px 10px 6px 8px;margin-left:-8px;font-size:13px;color:var(--ink-2);font-weight:500;border-radius:8px}
+.wholeweek{margin:4px 0 0;font-size:12px;color:var(--ink-2);font-style:italic}
+.week{margin-top:8px}
+.week>summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:4px 9px 4px 7px;margin-left:-7px;font-size:12.5px;color:var(--ink-2);font-weight:500;border-radius:7px}
 .week>summary:hover{background:var(--paper-2);color:var(--ink)}
 .week>summary::-webkit-details-marker{display:none}
 .week>summary::before{content:'▸';color:var(--accent);transition:transform .15s ease}
 .week[open]>summary::before{transform:rotate(90deg)}
-.week-day{margin-top:10px}
-.week-day-title{font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin:0 0 4px}
-.week-day .items{padding-left:14px}
-.week-day .item{padding:4px 0;font-size:13.5px;color:var(--ink-2)}
-.week-day .item::before{background:var(--ink-3);top:12px}
+.week-day{margin-top:8px}
+.week-day-title{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin:0 0 3px}
+.week-day .items{padding-left:13px}
+.week-day .item{padding:2px 0;font-size:12.5px;color:var(--ink-2)}
+.week-day .item::before{background:var(--ink-3);top:9px;width:3px;height:3px}
 .week-day .item .tag{color:var(--ink-2)}
 .scrape-fail{margin:10px 0 0;padding:12px 14px;background:var(--bad-soft);border:1px solid var(--hair);border-radius:10px;font-size:13.5px;color:var(--ink-2);display:flex;align-items:flex-start;gap:10px}
 .scrape-fail .ico{color:var(--bad);font-weight:800;line-height:1.3}
@@ -323,7 +341,7 @@ const dayEl=document.querySelector('[data-today-day]');
 if(dayEl&&t.day!==BUILD_DAY)dayEl.textContent=DAY_NAMES[t.day];
 if(t.day!==BUILD_DAY){
   const dn=(DAY_NAMES[t.day]||'').toUpperCase();
-  document.querySelectorAll('.idag .day').forEach(el=>{el.textContent=dn});
+  document.querySelectorAll('.when .day').forEach(el=>{el.textContent=dn});
 }
 if(weekend)document.querySelectorAll('details.week').forEach(d=>d.setAttribute('open',''));
 })();`;
