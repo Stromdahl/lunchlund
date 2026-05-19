@@ -6,6 +6,23 @@ const PAGE_URL = "https://stromdahl.github.io/lunchlund";
 const FEED_BASE = "https://stromdahl.github.io";
 const WEEKDAYS = ["Måndag", "Tisdag", "Onsdag", "Torsdag", "Fredag"];
 
+function isoWeek(d: Date): { year: number; week: number } {
+  // ISO 8601: the Thursday of the same week determines the year.
+  const t = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+  t.setUTCDate(t.getUTCDate() + 4 - (t.getUTCDay() || 7));
+  const yearStart = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
+  const week = Math.ceil(((t.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+  return { year: t.getUTCFullYear(), week };
+}
+
+function mondayOf(d: Date): Date {
+  const m = new Date(d);
+  const dow = (m.getDay() + 6) % 7; // 0 = Mon
+  m.setDate(m.getDate() - dow);
+  m.setHours(12, 0, 0, 0);
+  return m;
+}
+
 export function renderJson(result: ScrapeResult): string {
   return JSON.stringify(
     {
@@ -50,13 +67,24 @@ function buildItem(
   day: DayMenu,
   fetchedAt: Date,
 ): RssItem {
-  const date = weekdayDate(fetchedAt, day.day);
-  // Use noon local time so the day always lands correctly regardless of TZ.
-  date.setHours(12, 0, 0, 0);
-
   const slug = slugify(restaurant.name);
-  const isoDate = date.toISOString().slice(0, 10);
-  const guid = `lunchlund:${slug}:${isoDate}`;
+  const isWeekday = WEEKDAYS.some(
+    (w) => w.toLowerCase() === day.day.toLowerCase(),
+  );
+
+  let date: Date;
+  let guid: string;
+  if (isWeekday) {
+    date = weekdayDate(fetchedAt, day.day);
+    date.setHours(12, 0, 0, 0);
+    guid = `lunchlund:${slug}:${date.toISOString().slice(0, 10)}`;
+  } else {
+    // Whole-week menu (e.g. Troppo). Anchor it to the Monday of the current
+    // ISO week so subscribers see it once a week rather than once a day.
+    date = mondayOf(fetchedAt);
+    const { year, week } = isoWeek(fetchedAt);
+    guid = `lunchlund:${slug}:${year}-W${String(week).padStart(2, "0")}`;
+  }
 
   const descHtml = `<ul>${day.lines
     .map((l) => `<li>${escapeXml(l)}</li>`)

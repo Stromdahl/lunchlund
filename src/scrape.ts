@@ -4,6 +4,7 @@ import { scrapeEatery } from "./scrapers/eatery";
 import { scrapeKantin } from "./scrapers/kantin";
 import { scrapeEdison } from "./scrapers/edison";
 import { scrapeInspira } from "./scrapers/inspira";
+import { scrapeTroppo } from "./scrapers/troppo";
 
 const SCRAPERS: { name: string; run: () => Promise<Restaurant> }[] = [
   { name: "bricks", run: scrapeBricks },
@@ -11,6 +12,7 @@ const SCRAPERS: { name: string; run: () => Promise<Restaurant> }[] = [
   { name: "kantin", run: scrapeKantin },
   { name: "edison", run: scrapeEdison },
   { name: "inspira", run: scrapeInspira },
+  { name: "troppo", run: scrapeTroppo },
 ];
 
 export async function scrapeAll(): Promise<ScrapeResult> {

@@ -28,13 +28,29 @@ function escapeHtml(s: string): string {
     .replace(/"/g, "&quot;");
 }
 
+const WEEKDAY_NAMES_LOWER = [
+  "måndag",
+  "tisdag",
+  "onsdag",
+  "torsdag",
+  "fredag",
+];
+
+function isWeekdayLabel(s: string): boolean {
+  return WEEKDAY_NAMES_LOWER.includes(s.trim().toLowerCase());
+}
+
 function renderRestaurant(
   r: Restaurant,
   today: string | null,
   fetchedAt: Date,
 ): string {
+  // On a weekday, prefer a matching weekday entry; fall back to a non-weekday
+  // entry (Troppo posts one "Hela veckan" menu for the whole week).
   const todayBlock = today
-    ? r.menu.find((m) => m.day.toLowerCase() === today.toLowerCase())
+    ? (r.menu.find((m) => m.day.toLowerCase() === today.toLowerCase()) ??
+        r.menu.find((m) => !isWeekdayLabel(m.day)) ??
+        null)
     : null;
   const otherDays = r.menu.filter((m) => m !== todayBlock);
 
@@ -197,7 +213,8 @@ export function render(result: ScrapeResult): string {
         <a href="https://eatery.se/anlaggningar/lund" target="_blank" rel="noopener">eatery.se</a> ·
         <a href="https://www.kantinlund.se/" target="_blank" rel="noopener">kantinlund.se</a> ·
         <a href="https://restaurangedison.se/" target="_blank" rel="noopener">restaurangedison.se</a> ·
-        <a href="https://restauranginspira.se/" target="_blank" rel="noopener">restauranginspira.se</a>
+        <a href="https://restauranginspira.se/" target="_blank" rel="noopener">restauranginspira.se</a> ·
+        <a href="https://www.troppo.se/lunch" target="_blank" rel="noopener">troppo.se</a>
       </div>
     </footer>
   </main>
