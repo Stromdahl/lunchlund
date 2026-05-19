@@ -3,6 +3,18 @@ export type DayMenu = {
   lines: string[];
 };
 
+export type WeekdayKey =
+  | "mon"
+  | "tue"
+  | "wed"
+  | "thu"
+  | "fri"
+  | "sat"
+  | "sun";
+
+export type OpeningInterval = { open: string; close: string }; // "HH:MM"
+export type WeeklyHours = Record<WeekdayKey, OpeningInterval[]>;
+
 export type Restaurant = {
   name: string;
   address: string;
@@ -10,6 +22,7 @@ export type Restaurant = {
   /** Free-form annotation shown under the name (e.g. "Lunchmeny V21"). */
   note?: string;
   menu: DayMenu[];
+  hours?: WeeklyHours;
 };
 
 export type ScrapeResult = {

@@ -1,5 +1,5 @@
 import * as cheerio from "cheerio";
-import { Restaurant, DayMenu } from "../types";
+import { Restaurant, DayMenu, WeeklyHours } from "../types";
 
 // Bricks Eatery, Edison and Inspira all build their site on the same
 // Elementor "lunchmeny" shortcode, so the markup is identical. The day
@@ -18,6 +18,7 @@ export type ElementorLunchOpts = {
   url: string;
   name: string;
   address: string;
+  hours?: WeeklyHours;
 };
 
 export async function scrapeElementorLunch(
@@ -56,5 +57,6 @@ export async function scrapeElementorLunch(
     website: opts.url,
     note,
     menu,
+    hours: opts.hours,
   };
 }

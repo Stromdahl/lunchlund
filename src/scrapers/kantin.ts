@@ -1,8 +1,11 @@
 import * as cheerio from "cheerio";
 import { Restaurant, DayMenu } from "../types";
+import { weekdayLunch } from "../hours";
 
 const URL = "https://www.kantinlund.se/";
 const DAYS = ["Måndag", "Tisdag", "Onsdag", "Torsdag", "Fredag"];
+// Kantin: kitchen serves until 15:00 (building open till 16:00).
+const HOURS = weekdayLunch("11:00", "15:00");
 
 export async function scrapeKantin(): Promise<Restaurant> {
   const res = await fetch(URL, {
@@ -47,5 +50,6 @@ export async function scrapeKantin(): Promise<Restaurant> {
     website: URL,
     note,
     menu,
+    hours: HOURS,
   };
 }

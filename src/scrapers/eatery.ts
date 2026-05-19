@@ -1,6 +1,9 @@
 import { spawn } from "node:child_process";
 import * as cheerio from "cheerio";
 import { Restaurant, DayMenu } from "../types";
+import { weekdayLunch } from "../hours";
+
+const HOURS = weekdayLunch("11:00", "14:00");
 
 const PAGE_URL = "https://eatery.se/anlaggningar/lund";
 const DAY_TOKENS = ["MÅNDAG", "TISDAG", "ONSDAG", "TORSDAG", "FREDAG"];
@@ -24,6 +27,7 @@ export async function scrapeEatery(): Promise<Restaurant> {
     website: PAGE_URL,
     note: week,
     menu,
+    hours: HOURS,
   };
 }
 

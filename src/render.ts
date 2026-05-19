@@ -1,4 +1,5 @@
 import { Restaurant, ScrapeResult } from "./types";
+import { formatInterval, stockholmDayAndTime } from "./hours";
 
 const WEEKDAYS = ["Måndag", "Tisdag", "Onsdag", "Torsdag", "Fredag"];
 
@@ -27,11 +28,24 @@ function escapeHtml(s: string): string {
     .replace(/"/g, "&quot;");
 }
 
-function renderRestaurant(r: Restaurant, today: string | null): string {
+function renderRestaurant(
+  r: Restaurant,
+  today: string | null,
+  fetchedAt: Date,
+): string {
   const todayBlock = today
     ? r.menu.find((m) => m.day.toLowerCase() === today.toLowerCase())
     : null;
   const otherDays = r.menu.filter((m) => m !== todayBlock);
+
+  const dayKey = stockholmDayAndTime(fetchedAt).day;
+  const todayHours = r.hours?.[dayKey] ?? [];
+  const hoursText = todayHours.length
+    ? "Idag " + todayHours.map(formatInterval).join(", ")
+    : "Stängt idag";
+  const hoursAttr = r.hours
+    ? ` data-hours="${escapeHtml(JSON.stringify(r.hours))}"`
+    : "";
 
   const todayHtml = todayBlock
     ? `<div class="today">
@@ -61,10 +75,14 @@ function renderRestaurant(r: Restaurant, today: string | null): string {
 
   const note = r.note ? `<span class="note">${escapeHtml(r.note)}</span>` : "";
 
-  return `<article class="restaurant">
+  return `<article class="restaurant"${hoursAttr}>
     <header>
       <h2>${escapeHtml(r.name)} ${note}</h2>
       <div class="meta">${escapeHtml(r.address)} ${link}</div>
+      <div class="hours-line">
+        <span class="hours-today">${escapeHtml(hoursText)}</span>
+        <span class="badge" aria-live="polite"></span>
+      </div>
     </header>
     ${todayHtml}
     ${restHtml}
@@ -73,7 +91,9 @@ function renderRestaurant(r: Restaurant, today: string | null): string {
 
 export function render(result: ScrapeResult): string {
   const today = todayName(result.fetchedAt);
-  const cards = result.restaurants.map((r) => renderRestaurant(r, today)).join("\n");
+  const cards = result.restaurants
+    .map((r) => renderRestaurant(r, today, result.fetchedAt))
+    .join("\n");
   const errorList = result.errors.length
     ? `<div class="errors">
         <strong>Vissa källor misslyckades:</strong>
@@ -119,9 +139,17 @@ export function render(result: ScrapeResult): string {
     }
     .restaurant h2 { margin: 0 0 4px; font-size: 18px; }
     .restaurant h2 .note { color: var(--muted); font-size: 13px; font-weight: 400; margin-left: 6px; }
-    .meta { color: var(--muted); font-size: 13px; margin-bottom: 10px; }
+    .meta { color: var(--muted); font-size: 13px; margin-bottom: 4px; }
     .meta .site { margin-left: 8px; color: var(--accent); text-decoration: none; }
     .meta .site:hover { text-decoration: underline; }
+    .hours-line { font-size: 13px; color: var(--muted); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .badge {
+      display: inline-block; font-size: 12px; padding: 2px 8px; border-radius: 999px;
+      background: #ececea; color: var(--muted);
+    }
+    .badge.open { background: #d8efd0; color: #1d5f0e; }
+    .badge.closed { background: #f0dcd0; color: #8a2b00; }
+    .badge:empty { display: none; }
     .day-label {
       font-weight: 600;
       font-size: 13px;
@@ -170,6 +198,40 @@ export function render(result: ScrapeResult): string {
       </div>
     </footer>
   </main>
+  <script>
+  (function () {
+    var fmt = new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Europe/Stockholm",
+      weekday: "short", hour: "2-digit", minute: "2-digit", hour12: false,
+    });
+    var parts = fmt.formatToParts(new Date());
+    function get(t) { var p = parts.find(function (x) { return x.type === t; }); return p ? p.value : ""; }
+    var dow = get("weekday").toLowerCase().slice(0, 3);
+    var nowMin = +get("hour") * 60 + +get("minute");
+    function toMin(s) { var p = s.split(":"); return +p[0] * 60 + +p[1]; }
+    function fmtInterval(i) { return i.open + "–" + i.close; }
+    document.querySelectorAll(".restaurant[data-hours]").forEach(function (card) {
+      var hours;
+      try { hours = JSON.parse(card.dataset.hours); } catch (e) { return; }
+      var badge = card.querySelector(".badge");
+      var line = card.querySelector(".hours-today");
+      var today = hours[dow] || [];
+      if (line) line.textContent = today.length ? "Idag " + today.map(fmtInterval).join(", ") : "Stängt idag";
+      if (!badge) return;
+      var openNow = today.find(function (i) {
+        return nowMin >= toMin(i.open) && nowMin < toMin(i.close);
+      });
+      if (openNow) {
+        badge.textContent = "Öppet nu";
+        badge.classList.add("open");
+        return;
+      }
+      var next = today.find(function (i) { return toMin(i.open) > nowMin; });
+      badge.textContent = next ? "Öppnar " + next.open : "Stängt";
+      badge.classList.add("closed");
+    });
+  })();
+  </script>
 </body>
 </html>
 `;
