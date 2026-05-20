@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { weekdayLunch, formatInterval } from "./hours";
+import { weekdayLunch, formatInterval } from "../src/hours";
 
 test("weekdayLunch produces mon-fri intervals, weekends empty", () => {
   const h = weekdayLunch("11:00", "14:00");

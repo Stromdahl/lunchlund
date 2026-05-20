@@ -1,7 +1,7 @@
 import test from "node:test";
-import { parseElementorLunch } from "./elementor-lunch";
-import { weekdayLunch } from "../hours";
-import { matchSnapshot, readFixture } from "./__fixtures__/snapshot";
+import { parseElementorLunch } from "../../src/scrapers/elementor-lunch";
+import { weekdayLunch } from "../../src/hours";
+import { matchSnapshot, readFixture } from "../fixtures/snapshot";
 
 test("parseElementorLunch (edison) matches snapshot", () => {
   const html = readFixture("edison.html");

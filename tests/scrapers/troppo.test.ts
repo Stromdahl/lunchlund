@@ -1,6 +1,6 @@
 import test from "node:test";
-import { parseTroppo } from "./troppo";
-import { matchSnapshot, readFixture } from "./__fixtures__/snapshot";
+import { parseTroppo } from "../../src/scrapers/troppo";
+import { matchSnapshot, readFixture } from "../fixtures/snapshot";
 
 test("parseTroppo matches snapshot", () => {
   const html = readFixture("troppo.html");

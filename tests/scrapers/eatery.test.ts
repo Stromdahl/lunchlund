@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { parseEateryLanding, parseEateryMenu } from "./eatery";
-import { matchSnapshot, readFixture } from "./__fixtures__/snapshot";
+import { parseEateryLanding, parseEateryMenu } from "../../src/scrapers/eatery";
+import { matchSnapshot, readFixture } from "../fixtures/snapshot";
 
 test("parseEateryLanding picks PDF URL and price", () => {
   const html = readFixture("eatery-landing.html");

@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { parseKantin } from "./kantin";
-import { matchSnapshot, readFixture } from "./__fixtures__/snapshot";
+import { parseKantin } from "../../src/scrapers/kantin";
+import { matchSnapshot, readFixture } from "../fixtures/snapshot";
 
 test("parseKantin matches snapshot", () => {
   const html = readFixture("kantin.html");

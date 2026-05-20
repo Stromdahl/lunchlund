@@ -107,20 +107,21 @@ Most likely things to break:
 ## Tests
 
 `yarn test` runs `node --test` against TS sources via `ts-node/register`.
-Each scraper has a `*.test.ts` that feeds a captured fixture
-(`src/scrapers/__fixtures__/<source>.html|.txt`) into the pure parser and
-asserts the result deep-equals a stored snapshot
-(`<source>.snap.json`). To intentionally update a snapshot, delete the
-`.snap.json` and rerun — the helper at `__fixtures__/snapshot.ts` writes a
-fresh baseline on first run.
+Tests live under `tests/` (mirroring `src/`); each scraper has a
+`tests/scrapers/<source>.test.ts` that feeds a captured fixture
+(`tests/fixtures/<source>.html|.txt`) into the pure parser and asserts
+the result deep-equals a stored snapshot (`tests/fixtures/<source>.snap.json`).
+To intentionally update a snapshot, delete the `.snap.json` and rerun —
+the helper at `tests/fixtures/snapshot.ts` writes a fresh baseline on
+first run.
 
 When adding a new scraper:
 
 1. Add `src/scrapers/<name>.ts` exporting `parse<Name>(html | text)` (pure)
    plus a `ScraperDescriptor` const.
 2. Append the descriptor to `src/scrapers/index.ts`.
-3. Capture a fixture into `__fixtures__/<name>.html`.
-4. Add `src/scrapers/<name>.test.ts` that calls `parse<Name>` against the
+3. Capture a fixture into `tests/fixtures/<name>.html`.
+4. Add `tests/scrapers/<name>.test.ts` that calls `parse<Name>` against the
    fixture and `matchSnapshot`.
 
 ## Package manager

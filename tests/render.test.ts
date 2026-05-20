@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { render } from "./render";
+import { render } from "../src/render";
 
 test("render outputs an error card when a restaurant has an error", () => {
   const out = render({
