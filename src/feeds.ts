@@ -1,10 +1,10 @@
 import { ScrapeResult, Restaurant, DayMenu } from "./types";
+import { WEEKDAYS } from "./hours";
 
 // HTML page lives on the project Pages site; feeds are mirrored to the
 // user-level Pages site so the canonical URLs are short.
 const PAGE_URL = "https://stromdahl.github.io/lunchlund";
 const FEED_BASE = "https://stromdahl.github.io";
-const WEEKDAYS = ["Måndag", "Tisdag", "Onsdag", "Torsdag", "Fredag"];
 
 function isoWeek(d: Date): { year: number; week: number } {
   // ISO 8601: the Thursday of the same week determines the year.
@@ -69,7 +69,7 @@ function buildItem(
 ): RssItem {
   const slug = slugify(restaurant.name);
   const isWeekday = WEEKDAYS.some(
-    (w) => w.toLowerCase() === day.day.toLowerCase(),
+    (w) => w.sv.toLowerCase() === day.day.toLowerCase(),
   );
 
   let date: Date;
@@ -104,7 +104,7 @@ function buildItem(
 
 function weekdayDate(reference: Date, swedishDay: string): Date {
   const idx = WEEKDAYS.findIndex(
-    (d) => d.toLowerCase() === swedishDay.toLowerCase(),
+    (d) => d.sv.toLowerCase() === swedishDay.toLowerCase(),
   );
   if (idx === -1) return new Date(reference);
   // Find the Monday of the same ISO week as `reference`.

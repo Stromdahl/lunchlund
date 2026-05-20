@@ -1,5 +1,6 @@
 import * as cheerio from "cheerio";
 import { Restaurant, DayMenu, WeeklyHours } from "../types";
+import { WEEKDAYS } from "../hours";
 import { cleanText, fetchText } from "./lib";
 
 // Bricks Eatery, Edison and Inspira all build their site on the same
@@ -7,13 +8,6 @@ import { cleanText, fetchText } from "./lib";
 // containers are tagged with English weekday class names; inside, each dish
 // is a .lunchmeny_container with a .lunch_title (category like "Green") and
 // a .lunch_desc.
-const DAY_CLASSES: { day: string; cls: string }[] = [
-  { day: "Måndag", cls: "monday" },
-  { day: "Tisdag", cls: "tuesday" },
-  { day: "Onsdag", cls: "wednesday" },
-  { day: "Torsdag", cls: "thursday" },
-  { day: "Fredag", cls: "friday" },
-];
 
 export type ElementorLunchOpts = {
   url: string;
@@ -42,7 +36,7 @@ export function parseElementorLunch(
   });
 
   const menu: DayMenu[] = [];
-  for (const { day, cls } of DAY_CLASSES) {
+  for (const { sv: day, en: cls } of WEEKDAYS) {
     const lines: string[] = [];
     $(`.${cls} .lunchmeny_container`).each((_, el) => {
       const c = $(el);

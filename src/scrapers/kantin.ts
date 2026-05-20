@@ -1,10 +1,10 @@
 import * as cheerio from "cheerio";
 import { Restaurant, DayMenu } from "../types";
-import { weekdayLunch } from "../hours";
+import { WEEKDAYS, weekdayLunch } from "../hours";
 import { cleanText, fetchText } from "./lib";
 
 const URL = "https://www.kantinlund.se/";
-const DAYS = ["Måndag", "Tisdag", "Onsdag", "Torsdag", "Fredag"];
+const DAYS = WEEKDAYS.map((d) => d.sv);
 // Whole-week extras that run every weekday alongside the daily dish. Order
 // here is the order they're prepended on each day.
 const WEEKLY_EXTRAS = ["Veckans vegetariska", "Månadens alternativ"];

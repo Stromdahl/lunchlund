@@ -4,36 +4,7 @@
 // and opens disclosures on weekends.
 
 import { Restaurant, ScrapeResult, WeekdayKey, WeeklyHours } from "./types";
-
-const DAY_KEYS: WeekdayKey[] = [
-  "mon",
-  "tue",
-  "wed",
-  "thu",
-  "fri",
-  "sat",
-  "sun",
-];
-
-const DAY_NAMES: Record<WeekdayKey, string> = {
-  mon: "Måndag",
-  tue: "Tisdag",
-  wed: "Onsdag",
-  thu: "Torsdag",
-  fri: "Fredag",
-  sat: "Lördag",
-  sun: "Söndag",
-};
-
-const SV_TO_KEY: Record<string, WeekdayKey> = {
-  måndag: "mon",
-  tisdag: "tue",
-  onsdag: "wed",
-  torsdag: "thu",
-  fredag: "fri",
-  lördag: "sat",
-  söndag: "sun",
-};
+import { WEEKDAY_KEYS as DAY_KEYS, daySv, keyFromSv } from "./hours";
 
 function esc(s: string | undefined | null): string {
   if (s == null) return "";
@@ -100,9 +71,7 @@ function hoursAttr(hours: WeeklyHours | undefined): string {
 }
 
 function isWholeWeekMenu(r: Restaurant): boolean {
-  return (
-    r.menu.length === 1 && !SV_TO_KEY[r.menu[0].day.trim().toLowerCase()]
-  );
+  return r.menu.length === 1 && !keyFromSv(r.menu[0].day);
 }
 
 // Items are scraped as concatenated strings like "Green: Pasta med ...".
@@ -135,7 +104,7 @@ function renderWeekDay(day: string, lines: string[]): string {
 function renderCard(r: Restaurant, todayKey: WeekdayKey): string {
   const wholeWeek = isWholeWeekMenu(r);
   const isWeekend = todayKey === "sat" || todayKey === "sun";
-  const todayName = DAY_NAMES[todayKey];
+  const todayName = daySv(todayKey);
 
   // Today's menu entry: whole-week takes the lone entry; weekdays match by
   // Swedish day name; weekends have no "today" — the disclosure carries the
@@ -351,7 +320,7 @@ export function render(result: ScrapeResult): string {
   const { restaurants, errors, fetchedAt } = result;
   const built = fmtBuild(fetchedAt);
   const todayKey = built.dayKey;
-  const todayDayName = DAY_NAMES[todayKey];
+  const todayDayName = daySv(todayKey);
 
   // Match each error to a restaurant by source string vs name/hostname.
   const errorFor = (r: Restaurant) => {

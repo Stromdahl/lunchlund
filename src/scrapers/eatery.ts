@@ -1,20 +1,16 @@
 import { spawn } from "node:child_process";
 import * as cheerio from "cheerio";
 import { Restaurant, DayMenu } from "../types";
-import { weekdayLunch } from "../hours";
+import { WEEKDAYS, weekdayLunch } from "../hours";
 import { cleanText, fetchBuffer, fetchText } from "./lib";
 
 const HOURS = weekdayLunch("11:00", "14:00");
 
 const PAGE_URL = "https://eatery.se/anlaggningar/lund";
-const DAY_TOKENS = ["MÅNDAG", "TISDAG", "ONSDAG", "TORSDAG", "FREDAG"];
-const DAY_DISPLAY: Record<string, string> = {
-  MÅNDAG: "Måndag",
-  TISDAG: "Tisdag",
-  ONSDAG: "Onsdag",
-  TORSDAG: "Torsdag",
-  FREDAG: "Fredag",
-};
+const DAY_TOKENS = WEEKDAYS.map((d) => d.svUpper);
+const DAY_DISPLAY: Record<string, string> = Object.fromEntries(
+  WEEKDAYS.map((d) => [d.svUpper, d.sv]),
+);
 
 export async function scrapeEatery(): Promise<Restaurant> {
   const html = await fetchText(PAGE_URL, "eatery page");
