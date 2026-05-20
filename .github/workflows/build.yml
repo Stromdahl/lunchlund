@@ -4,10 +4,7 @@ on:
   push:
     branches: [main]
   schedule:
-    # Mon–Fri at 07:23 Stockholm time. Off-the-hour to avoid GitHub's
-    # high-contention cron slots — :00 ticks routinely skip on the free
-    # runner pool.
-    - cron: "23 7 * * 1-5"
+    - cron: '23 5 * * 1-5'
       timezone: "Europe/Stockholm"
   workflow_dispatch:
 
