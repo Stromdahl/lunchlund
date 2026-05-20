@@ -4,6 +4,9 @@ import { weekdayLunch } from "../hours";
 
 const URL = "https://www.kantinlund.se/";
 const DAYS = ["Måndag", "Tisdag", "Onsdag", "Torsdag", "Fredag"];
+// Whole-week extras that run every weekday alongside the daily dish. Order
+// here is the order they're prepended on each day.
+const WEEKLY_EXTRAS = ["Veckans vegetariska", "Månadens alternativ"];
 // Kantin: kitchen serves until 15:00 (building open till 16:00).
 const HOURS = weekdayLunch("11:00", "15:00");
 
@@ -24,37 +27,47 @@ export async function scrapeKantin(): Promise<Restaurant> {
     }
   });
 
-  // Each day is a <p> whose first child is a <strong> with the day name,
-  // followed by the dish text. The same paragraph shape is used for
-  // "Veckans vegetariska" (a vegetarian option available every weekday) —
-  // pick that up too and prepend it to each day's lines.
-  // Skip paragraphs where the strong is plain body text (e.g.
-  // "Måndag till fredag kl. 11–16").
+  // Each day is a <p> whose first child is a <strong>. Two shapes appear:
+  //   <strong>Måndag </strong>dish text…
+  //   <strong>Veckans vegetariska </strong>dish text…
+  //   <strong>Månadens alternativ <span style="font-weight:400">dish…</span></strong>
+  // The last one keeps the dish inside the strong via a non-bold span, so
+  // peeking only at strong.text() isn't enough — match on the full paragraph
+  // text against the known label prefixes. Skip paragraphs where the strong
+  // is plain body text (e.g. "Måndag till fredag kl. 11–16").
   const menu: DayMenu[] = [];
-  let veggie: string | undefined;
+  const extras = new Map<string, string>();
   $("p").each((_, p) => {
     const para = $(p);
     const strong = para.children("strong").first();
     if (!strong.length) return;
     if (para.contents().first().get(0) !== strong.get(0)) return;
-    const label = strong.text().trim();
 
-    const clone = para.clone();
-    clone.children("strong").first().remove();
-    const rest = clone.text().replace(/\s+/g, " ").trim();
-    if (!rest) return;
+    const full = para.text().replace(/\s+/g, " ").trim();
+    if (!full) return;
 
-    const day = DAYS.find((d) => d.toLowerCase() === label.toLowerCase());
+    const day = DAYS.find((d) =>
+      new RegExp(`^${d}\\b`, "i").test(full),
+    );
     if (day) {
-      menu.push({ day, lines: [rest] });
+      const rest = full.replace(new RegExp(`^${day}\\s+`, "i"), "").trim();
+      if (rest) menu.push({ day, lines: [rest] });
       return;
     }
-    if (/^veckans vegetariska$/i.test(label)) {
-      veggie = `${label}: ${rest}`;
+
+    for (const lbl of WEEKLY_EXTRAS) {
+      const m = full.match(new RegExp(`^${lbl}\\s+(.+)$`, "i"));
+      if (m) {
+        extras.set(lbl, `${lbl}: ${m[1].trim()}`);
+        break;
+      }
     }
   });
-  if (veggie) {
-    for (const d of menu) d.lines.unshift(veggie);
+  if (extras.size) {
+    const prefix = WEEKLY_EXTRAS
+      .map((l) => extras.get(l))
+      .filter((s): s is string => !!s);
+    for (const d of menu) d.lines = [...prefix, ...d.lines];
   }
 
   return {
