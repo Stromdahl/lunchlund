@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import { scrapeAll } from "./scrape";
 import { render } from "./render";
 import { renderJson, renderRss } from "./feeds";
+import { SCRAPERS } from "./scrapers";
 
 type Args = { outDir: string };
 
@@ -12,6 +13,9 @@ function parseArgs(argv: string[]): Args {
     const a = argv[i];
     if (a === "--out" || a === "-o") args.outDir = argv[++i];
     else if (a === "--help" || a === "-h") {
+      const sources = SCRAPERS.map(
+        (s) => `  ${s.id.padEnd(8)} ${s.name} — ${s.address}`,
+      ).join("\n");
       console.log(
         [
           "lunchlund — scrape lunch menus for Mobilvägen 10 neighbours",
@@ -21,8 +25,7 @@ function parseArgs(argv: string[]): Args {
           "  --out, -o DIR   Output directory (default: dist)",
           "",
           "Sources:",
-          "  brickseatery.se        (Mobilvägen 12)",
-          "  eatery.se/.../lund     (Mobilvägen 4)",
+          sources,
         ].join("\n"),
       );
       process.exit(0);
@@ -37,10 +40,11 @@ async function main() {
   console.error("scraping…");
   const result = await scrapeAll();
   for (const r of result.restaurants) {
-    console.error(`  ${r.name}: ${r.menu.length} day(s)`);
-  }
-  for (const e of result.errors) {
-    console.error(`  ${e.source}: FAILED — ${e.error}`);
+    if (r.error) {
+      console.error(`  ${r.error.source}: FAILED — ${r.error.error}`);
+    } else {
+      console.error(`  ${r.name}: ${r.menu.length} day(s)`);
+    }
   }
 
   const outDir = resolve(process.cwd(), args.outDir);

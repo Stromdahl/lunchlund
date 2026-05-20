@@ -26,10 +26,23 @@ export type Restaurant = {
   price?: string;
   menu: DayMenu[];
   hours?: WeeklyHours;
+  /** Set when the scraper for this restaurant failed. Identity (name/address/
+   *  website) still comes from the descriptor so the renderer can show a card. */
+  error?: { source: string; error: string };
+};
+
+/** What a scraper's parser produces — identity-free; the descriptor supplies it. */
+export type ScrapedData = Omit<Restaurant, "name" | "address" | "website" | "error">;
+
+export type ScraperDescriptor = {
+  id: string;
+  name: string;
+  address: string;
+  website: string;
+  scrape: () => Promise<ScrapedData>;
 };
 
 export type ScrapeResult = {
   fetchedAt: Date;
   restaurants: Restaurant[];
-  errors: { source: string; error: string }[];
 };

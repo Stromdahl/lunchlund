@@ -317,29 +317,17 @@ if(weekend)document.querySelectorAll('details.week').forEach(d=>d.setAttribute('
 }
 
 export function render(result: ScrapeResult): string {
-  const { restaurants, errors, fetchedAt } = result;
+  const { restaurants, fetchedAt } = result;
   const built = fmtBuild(fetchedAt);
   const todayKey = built.dayKey;
   const todayDayName = daySv(todayKey);
 
-  // Match each error to a restaurant by source string vs name/hostname.
-  const errorFor = (r: Restaurant) => {
-    const host = (r.website ?? "")
-      .replace(/^https?:\/\//, "")
-      .replace(/\/.*$/, "")
-      .toLowerCase();
-    const hay = [r.name, host].filter(Boolean).map((s) => s.toLowerCase());
-    return errors.find((e) => {
-      const s = e.source.toLowerCase();
-      return hay.some((h) => h.includes(s) || s.includes(h));
-    });
-  };
-
   const cards = restaurants
-    .map((r) => {
-      const e = errorFor(r);
-      return e ? renderErrorCard(r, e, fetchedAt) : renderCard(r, todayKey);
-    })
+    .map((r) =>
+      r.error
+        ? renderErrorCard(r, r.error, fetchedAt)
+        : renderCard(r, todayKey),
+    )
     .join("\n");
 
   const sourceLinks = restaurants

@@ -1,5 +1,5 @@
 import * as cheerio from "cheerio";
-import { Restaurant, DayMenu } from "../types";
+import { DayMenu, ScrapedData, ScraperDescriptor } from "../types";
 import { weekdayLunch } from "../hours";
 import { cleanText, fetchText } from "./lib";
 
@@ -10,7 +10,7 @@ const URL = "https://www.troppo.se/lunch";
 // today's menu on any weekday.
 const WHOLE_WEEK_LABEL = "Hela veckan";
 
-export function parseTroppo(html: string): Restaurant {
+export function parseTroppo(html: string): ScrapedData {
   const $ = cheerio.load(html);
 
   // Week heading is "Lunch Week NN, YYYY".
@@ -68,17 +68,13 @@ export function parseTroppo(html: string): Restaurant {
     ? [{ day: WHOLE_WEEK_LABEL, lines }]
     : [];
 
-  return {
-    name: "Troppo",
-    address: "Brunnshögsgatan 34, Lund",
-    website: URL,
-    note,
-    price,
-    menu,
-    hours: weekdayLunch("11:00", "14:00"),
-  };
+  return { note, price, menu, hours: weekdayLunch("11:00", "14:00") };
 }
 
-export async function scrapeTroppo(): Promise<Restaurant> {
-  return parseTroppo(await fetchText(URL, "troppo"));
-}
+export const troppo: ScraperDescriptor = {
+  id: "troppo",
+  name: "Troppo",
+  address: "Brunnshögsgatan 34, Lund",
+  website: URL,
+  scrape: async () => parseTroppo(await fetchText(URL, "troppo")),
+};

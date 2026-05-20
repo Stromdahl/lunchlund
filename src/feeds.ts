@@ -28,7 +28,6 @@ export function renderJson(result: ScrapeResult): string {
     {
       fetchedAt: result.fetchedAt.toISOString(),
       restaurants: result.restaurants,
-      errors: result.errors,
     },
     null,
     2,

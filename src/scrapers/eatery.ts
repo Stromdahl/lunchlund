@@ -1,6 +1,6 @@
 import { spawn } from "node:child_process";
 import * as cheerio from "cheerio";
-import { Restaurant, DayMenu } from "../types";
+import { DayMenu, ScrapedData, ScraperDescriptor } from "../types";
 import { WEEKDAYS, weekdayLunch } from "../hours";
 import { cleanText, fetchBuffer, fetchText } from "./lib";
 
@@ -12,23 +12,22 @@ const DAY_DISPLAY: Record<string, string> = Object.fromEntries(
   WEEKDAYS.map((d) => [d.svUpper, d.sv]),
 );
 
-export async function scrapeEatery(): Promise<Restaurant> {
+async function scrapeEatery(): Promise<ScrapedData> {
   const html = await fetchText(PAGE_URL, "eatery page");
   const { pdfUrl, price } = parseEateryLanding(html);
   const pdf = await fetchBuffer(pdfUrl, "eatery pdf");
   const text = await pdfToText(pdf);
   const { menu, week } = parseEateryMenu(text);
-
-  return {
-    name: "Eatery Lund",
-    address: "Mobilvägen 4, Lund",
-    website: PAGE_URL,
-    note: week,
-    price,
-    menu,
-    hours: HOURS,
-  };
+  return { note: week, price, menu, hours: HOURS };
 }
+
+export const eatery: ScraperDescriptor = {
+  id: "eatery",
+  name: "Eatery Lund",
+  address: "Mobilvägen 4, Lund",
+  website: PAGE_URL,
+  scrape: scrapeEatery,
+};
 
 export function parseEateryLanding(html: string): {
   pdfUrl: string;

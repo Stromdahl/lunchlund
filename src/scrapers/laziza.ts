@@ -1,5 +1,5 @@
 import * as cheerio from "cheerio";
-import { Restaurant, DayMenu } from "../types";
+import { DayMenu, ScrapedData, ScraperDescriptor } from "../types";
 import { weekdayLunch } from "../hours";
 import { cleanText, fetchText } from "./lib";
 
@@ -9,7 +9,7 @@ const URL = "https://www.laziza.se/lunch/";
 // label that the renderer treats as "today and the whole week".
 const WHOLE_WEEK_LABEL = "Hela veckan";
 
-export function parseLaziza(html: string): Restaurant {
+export function parseLaziza(html: string): ScrapedData {
   const $ = cheerio.load(html);
 
   // The page header block has:
@@ -42,16 +42,13 @@ export function parseLaziza(html: string): Restaurant {
 
   const menu: DayMenu[] = [{ day: WHOLE_WEEK_LABEL, lines: [buffet] }];
 
-  return {
-    name: "Laziza",
-    address: "Scheelevägen 15K, Lund",
-    website: URL,
-    price,
-    menu,
-    hours: weekdayLunch("11:00", "14:00"),
-  };
+  return { price, menu, hours: weekdayLunch("11:00", "14:00") };
 }
 
-export async function scrapeLaziza(): Promise<Restaurant> {
-  return parseLaziza(await fetchText(URL, "laziza"));
-}
+export const laziza: ScraperDescriptor = {
+  id: "laziza",
+  name: "Laziza",
+  address: "Scheelevägen 15K, Lund",
+  website: URL,
+  scrape: async () => parseLaziza(await fetchText(URL, "laziza")),
+};

@@ -1,5 +1,5 @@
 import * as cheerio from "cheerio";
-import { Restaurant, DayMenu, WeeklyHours } from "../types";
+import { DayMenu, ScrapedData, WeeklyHours } from "../types";
 import { WEEKDAYS } from "../hours";
 import { cleanText, fetchText } from "./lib";
 
@@ -10,16 +10,14 @@ import { cleanText, fetchText } from "./lib";
 // a .lunch_desc.
 
 export type ElementorLunchOpts = {
-  url: string;
-  name: string;
-  address: string;
+  /** Static opening hours; the page doesn't publish them. */
   hours?: WeeklyHours;
 };
 
 export function parseElementorLunch(
   html: string,
-  opts: ElementorLunchOpts,
-): Restaurant {
+  opts: ElementorLunchOpts = {},
+): ScrapedData {
   const $ = cheerio.load(html);
 
   const note = cleanText($(".week").first().text()) || undefined;
@@ -52,19 +50,13 @@ export function parseElementorLunch(
     if (lines.length) menu.push({ day, lines });
   }
 
-  return {
-    name: opts.name,
-    address: opts.address,
-    website: opts.url,
-    note,
-    price,
-    menu,
-    hours: opts.hours,
-  };
+  return { note, price, menu, hours: opts.hours };
 }
 
 export async function scrapeElementorLunch(
-  opts: ElementorLunchOpts,
-): Promise<Restaurant> {
-  return parseElementorLunch(await fetchText(opts.url, opts.name), opts);
+  url: string,
+  label: string,
+  opts: ElementorLunchOpts = {},
+): Promise<ScrapedData> {
+  return parseElementorLunch(await fetchText(url, label), opts);
 }

@@ -1,5 +1,5 @@
 import * as cheerio from "cheerio";
-import { Restaurant, DayMenu } from "../types";
+import { DayMenu, ScrapedData, ScraperDescriptor } from "../types";
 import { WEEKDAYS, weekdayLunch } from "../hours";
 import { cleanText, fetchText } from "./lib";
 
@@ -11,7 +11,7 @@ const WEEKLY_EXTRAS = ["Veckans vegetariska", "Månadens alternativ"];
 // Kantin: kitchen serves until 15:00 (building open till 16:00).
 const HOURS = weekdayLunch("11:00", "15:00");
 
-export function parseKantin(html: string): Restaurant {
+export function parseKantin(html: string): ScrapedData {
   const $ = cheerio.load(html);
 
   // The week heading looks like "Meny  18/5 – 22/5" — pull it out as the note.
@@ -67,16 +67,13 @@ export function parseKantin(html: string): Restaurant {
     for (const d of menu) d.lines = [...prefix, ...d.lines];
   }
 
-  return {
-    name: "Kantin",
-    address: "Brunnshögsgatan 14, Lund",
-    website: URL,
-    note,
-    menu,
-    hours: HOURS,
-  };
+  return { note, menu, hours: HOURS };
 }
 
-export async function scrapeKantin(): Promise<Restaurant> {
-  return parseKantin(await fetchText(URL, "kantin"));
-}
+export const kantin: ScraperDescriptor = {
+  id: "kantin",
+  name: "Kantin",
+  address: "Brunnshögsgatan 14, Lund",
+  website: URL,
+  scrape: async () => parseKantin(await fetchText(URL, "kantin")),
+};
