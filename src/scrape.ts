@@ -5,6 +5,7 @@ import { scrapeKantin } from "./scrapers/kantin";
 import { scrapeEdison } from "./scrapers/edison";
 import { scrapeInspira } from "./scrapers/inspira";
 import { scrapeTroppo } from "./scrapers/troppo";
+import { scrapeLaziza } from "./scrapers/laziza";
 
 // A scraper failure should still leave the restaurant visible on the page so
 // the renderer can show an in-place "scrape failed" card instead of a top
@@ -71,6 +72,15 @@ const SOURCES: Source[] = [
       website: "https://www.troppo.se/lunch",
     },
     run: scrapeTroppo,
+  },
+  {
+    id: "laziza",
+    stub: {
+      name: "Laziza",
+      address: "Scheelevägen 15K, Lund",
+      website: "https://www.laziza.se/lunch/",
+    },
+    run: scrapeLaziza,
   },
 ];
 
