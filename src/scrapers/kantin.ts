@@ -24,25 +24,38 @@ export async function scrapeKantin(): Promise<Restaurant> {
     }
   });
 
-  // Each day is a <p> whose first child is a <strong> with just the day name,
-  // followed by the dish text. Skip paragraphs where the day name is plain
-  // body text (e.g. "Måndag till fredag kl. 11–16").
+  // Each day is a <p> whose first child is a <strong> with the day name,
+  // followed by the dish text. The same paragraph shape is used for
+  // "Veckans vegetariska" (a vegetarian option available every weekday) —
+  // pick that up too and prepend it to each day's lines.
+  // Skip paragraphs where the strong is plain body text (e.g.
+  // "Måndag till fredag kl. 11–16").
   const menu: DayMenu[] = [];
+  let veggie: string | undefined;
   $("p").each((_, p) => {
     const para = $(p);
     const strong = para.children("strong").first();
     if (!strong.length) return;
     if (para.contents().first().get(0) !== strong.get(0)) return;
-    const dayRaw = strong.text().trim();
-    const day = DAYS.find((d) => d.toLowerCase() === dayRaw.toLowerCase());
-    if (!day) return;
+    const label = strong.text().trim();
 
     const clone = para.clone();
     clone.children("strong").first().remove();
-    const dish = clone.text().replace(/\s+/g, " ").trim();
-    if (!dish) return;
-    menu.push({ day, lines: [dish] });
+    const rest = clone.text().replace(/\s+/g, " ").trim();
+    if (!rest) return;
+
+    const day = DAYS.find((d) => d.toLowerCase() === label.toLowerCase());
+    if (day) {
+      menu.push({ day, lines: [rest] });
+      return;
+    }
+    if (/^veckans vegetariska$/i.test(label)) {
+      veggie = `${label}: ${rest}`;
+    }
   });
+  if (veggie) {
+    for (const d of menu) d.lines.unshift(veggie);
+  }
 
   return {
     name: "Kantin",
