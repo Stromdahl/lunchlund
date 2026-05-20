@@ -1,6 +1,7 @@
 import * as cheerio from "cheerio";
 import { Restaurant, DayMenu } from "../types";
 import { weekdayLunch } from "../hours";
+import { cleanText, fetchText } from "./lib";
 
 const URL = "https://www.laziza.se/lunch/";
 // Laziza is a Lebanese buffet — same offer every weekday, no per-day menu —
@@ -18,7 +19,7 @@ export function parseLaziza(html: string): Restaurant {
   //   <h2>145 kr / 115 kr (take away)</h2>
   let buffet: string | undefined;
   $("h3").each((_, el) => {
-    const t = $(el).text().replace(/\s+/g, " ").trim();
+    const t = cleanText($(el).text());
     if (/lunchbuff/i.test(t)) {
       // The h3 reads "Libanesisk lunchbuffé, måndag till fredag" — drop the
       // weekday tail; the renderer already prints "Samma meny mån–fre." above.
@@ -32,7 +33,7 @@ export function parseLaziza(html: string): Restaurant {
 
   let price: string | undefined;
   $("h2").each((_, el) => {
-    const t = $(el).text().replace(/\s+/g, " ").trim();
+    const t = cleanText($(el).text());
     if (/\bkr\b/i.test(t) && !/boka/i.test(t)) {
       price = t;
       return false;
@@ -52,9 +53,5 @@ export function parseLaziza(html: string): Restaurant {
 }
 
 export async function scrapeLaziza(): Promise<Restaurant> {
-  const res = await fetch(URL, {
-    headers: { "user-agent": "lunchlund/0.1 (+local tool)" },
-  });
-  if (!res.ok) throw new Error(`laziza: ${res.status} ${res.statusText}`);
-  return parseLaziza(await res.text());
+  return parseLaziza(await fetchText(URL, "laziza"));
 }

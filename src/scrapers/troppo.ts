@@ -1,6 +1,7 @@
 import * as cheerio from "cheerio";
 import { Restaurant, DayMenu } from "../types";
 import { weekdayLunch } from "../hours";
+import { cleanText, fetchText } from "./lib";
 
 const URL = "https://www.troppo.se/lunch";
 // Troppo posts a single weekly lunch menu of 3 dishes available all weekdays,
@@ -15,7 +16,7 @@ export function parseTroppo(html: string): Restaurant {
   // Week heading is "Lunch Week NN, YYYY".
   let note: string | undefined;
   $("h1").each((_, el) => {
-    const t = $(el).text().replace(/[​-‍﻿]/g, "").replace(/\s+/g, " ").trim();
+    const t = cleanText($(el).text());
     if (/^Lunch Week/i.test(t)) {
       note = t;
       return false;
@@ -25,7 +26,7 @@ export function parseTroppo(html: string): Restaurant {
   // The price is a short <p> like "Lunch 149-159kr" right under the h1.
   let price: string | undefined;
   $("p").each((_, p) => {
-    const t = $(p).text().replace(/[​-‍﻿]/g, "").replace(/\s+/g, " ").trim();
+    const t = cleanText($(p).text());
     const m = t.match(/^Lunch\s+([\d]+(?:\s*[-–]\s*\d+)?\s*kr)$/i);
     if (m) {
       price = m[1].replace(/\s*[-–]\s*/, "–").replace(/\s+/g, "");
@@ -48,14 +49,14 @@ export function parseTroppo(html: string): Restaurant {
 
   const lines: string[] = [];
   container.find("strong").each((_, strong) => {
-    const name = $(strong).text().replace(/[​-‍﻿]/g, "").replace(/\s+/g, " ").trim();
+    const name = cleanText($(strong).text());
     if (!name || /^or$/i.test(name)) return;
     // Find the first non-empty <em> sibling after the strong, in document order.
     let desc = "";
     let cursor = $(strong).next();
     while (cursor.length && !desc) {
       if (cursor.is("em")) {
-        const t = cursor.text().replace(/[​-‍﻿]/g, "").replace(/\s+/g, " ").trim();
+        const t = cleanText(cursor.text());
         if (t) desc = t;
       }
       cursor = cursor.next();
@@ -79,9 +80,5 @@ export function parseTroppo(html: string): Restaurant {
 }
 
 export async function scrapeTroppo(): Promise<Restaurant> {
-  const res = await fetch(URL, {
-    headers: { "user-agent": "lunchlund/0.1 (+local tool)" },
-  });
-  if (!res.ok) throw new Error(`troppo: ${res.status} ${res.statusText}`);
-  return parseTroppo(await res.text());
+  return parseTroppo(await fetchText(URL, "troppo"));
 }

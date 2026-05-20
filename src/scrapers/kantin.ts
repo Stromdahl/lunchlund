@@ -1,6 +1,7 @@
 import * as cheerio from "cheerio";
 import { Restaurant, DayMenu } from "../types";
 import { weekdayLunch } from "../hours";
+import { cleanText, fetchText } from "./lib";
 
 const URL = "https://www.kantinlund.se/";
 const DAYS = ["Måndag", "Tisdag", "Onsdag", "Torsdag", "Fredag"];
@@ -16,7 +17,7 @@ export function parseKantin(html: string): Restaurant {
   // The week heading looks like "Meny  18/5 – 22/5" — pull it out as the note.
   let note: string | undefined;
   $("h1, h2").each((_, el) => {
-    const t = $(el).text().replace(/\s+/g, " ").trim();
+    const t = cleanText($(el).text());
     if (/^Meny\s/i.test(t)) {
       note = t;
       return false;
@@ -39,7 +40,7 @@ export function parseKantin(html: string): Restaurant {
     if (!strong.length) return;
     if (para.contents().first().get(0) !== strong.get(0)) return;
 
-    const full = para.text().replace(/\s+/g, " ").trim();
+    const full = cleanText(para.text());
     if (!full) return;
 
     const day = DAYS.find((d) =>
@@ -77,9 +78,5 @@ export function parseKantin(html: string): Restaurant {
 }
 
 export async function scrapeKantin(): Promise<Restaurant> {
-  const res = await fetch(URL, {
-    headers: { "user-agent": "lunchlund/0.1 (+local tool)" },
-  });
-  if (!res.ok) throw new Error(`kantin: ${res.status} ${res.statusText}`);
-  return parseKantin(await res.text());
+  return parseKantin(await fetchText(URL, "kantin"));
 }

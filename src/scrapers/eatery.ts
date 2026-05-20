@@ -2,6 +2,7 @@ import { spawn } from "node:child_process";
 import * as cheerio from "cheerio";
 import { Restaurant, DayMenu } from "../types";
 import { weekdayLunch } from "../hours";
+import { cleanText, fetchBuffer, fetchText } from "./lib";
 
 const HOURS = weekdayLunch("11:00", "14:00");
 
@@ -18,7 +19,7 @@ const DAY_DISPLAY: Record<string, string> = {
 export async function scrapeEatery(): Promise<Restaurant> {
   const html = await fetchText(PAGE_URL, "eatery page");
   const { pdfUrl, price } = parseEateryLanding(html);
-  const pdf = await fetchPdf(pdfUrl);
+  const pdf = await fetchBuffer(pdfUrl, "eatery pdf");
   const text = await pdfToText(pdf);
   const { menu, week } = parseEateryMenu(text);
 
@@ -31,14 +32,6 @@ export async function scrapeEatery(): Promise<Restaurant> {
     menu,
     hours: HOURS,
   };
-}
-
-async function fetchText(url: string, label: string): Promise<string> {
-  const res = await fetch(url, {
-    headers: { "user-agent": "lunchlund/0.1 (+local tool)" },
-  });
-  if (!res.ok) throw new Error(`${label}: ${res.status} ${res.statusText}`);
-  return res.text();
 }
 
 export function parseEateryLanding(html: string): {
@@ -64,7 +57,7 @@ export function parseEateryLanding(html: string): {
   // We join into one display string.
   const pricePairs: { time: string; amount: string }[] = [];
   $("p").each((_, p) => {
-    const t = $(p).text().replace(/\s+/g, " ").trim();
+    const t = cleanText($(p).text());
     const m = t.match(/(\d{1,2}[:.]\d{2}\s*[-–]\s*\d{1,2}[:.]\d{2})\s*\(([^)]+)\)\s*(\d{2,3}\s*kr)/i);
     if (m) {
       pricePairs.push({
@@ -84,12 +77,6 @@ export function parseEateryLanding(html: string): {
   }
 
   return { pdfUrl, price };
-}
-
-async function fetchPdf(url: string): Promise<Buffer> {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`eatery pdf: ${res.status} ${res.statusText}`);
-  return Buffer.from(await res.arrayBuffer());
 }
 
 function pdfToText(pdf: Buffer): Promise<string> {

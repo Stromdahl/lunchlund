@@ -1,5 +1,6 @@
 import * as cheerio from "cheerio";
 import { Restaurant, DayMenu, WeeklyHours } from "../types";
+import { cleanText, fetchText } from "./lib";
 
 // Bricks Eatery, Edison and Inspira all build their site on the same
 // Elementor "lunchmeny" shortcode, so the markup is identical. The day
@@ -27,13 +28,13 @@ export function parseElementorLunch(
 ): Restaurant {
   const $ = cheerio.load(html);
 
-  const note = $(".week").first().text().replace(/\s+/g, " ").trim() || undefined;
+  const note = cleanText($(".week").first().text()) || undefined;
 
   // The Elementor "lunchmeny" shortcode prints a .lunch_price per dish. Bricks
   // and Edison fill it with a single uniform price; Inspira leaves it blank.
   let price: string | undefined;
   $(".lunch_price").each((_, el) => {
-    const t = $(el).text().replace(/\s+/g, " ").trim();
+    const t = cleanText($(el).text());
     if (t) {
       price = t;
       return false;
@@ -45,8 +46,8 @@ export function parseElementorLunch(
     const lines: string[] = [];
     $(`.${cls} .lunchmeny_container`).each((_, el) => {
       const c = $(el);
-      const title = c.find(".lunch_title").text().trim();
-      const desc = c.find(".lunch_desc").text().trim().replace(/\s+/g, " ");
+      const title = cleanText(c.find(".lunch_title").text());
+      const desc = cleanText(c.find(".lunch_desc").text());
       if (!title && !desc) return;
       if (!desc) {
         lines.push(title);
@@ -71,11 +72,5 @@ export function parseElementorLunch(
 export async function scrapeElementorLunch(
   opts: ElementorLunchOpts,
 ): Promise<Restaurant> {
-  const res = await fetch(opts.url, {
-    headers: { "user-agent": "lunchlund/0.1 (+local tool)" },
-  });
-  if (!res.ok) {
-    throw new Error(`${opts.name}: ${res.status} ${res.statusText}`);
-  }
-  return parseElementorLunch(await res.text(), opts);
+  return parseElementorLunch(await fetchText(opts.url, opts.name), opts);
 }
