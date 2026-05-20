@@ -10,12 +10,8 @@ const WEEKLY_EXTRAS = ["Veckans vegetariska", "Månadens alternativ"];
 // Kantin: kitchen serves until 15:00 (building open till 16:00).
 const HOURS = weekdayLunch("11:00", "15:00");
 
-export async function scrapeKantin(): Promise<Restaurant> {
-  const res = await fetch(URL, {
-    headers: { "user-agent": "lunchlund/0.1 (+local tool)" },
-  });
-  if (!res.ok) throw new Error(`kantin: ${res.status} ${res.statusText}`);
-  const $ = cheerio.load(await res.text());
+export function parseKantin(html: string): Restaurant {
+  const $ = cheerio.load(html);
 
   // The week heading looks like "Meny  18/5 – 22/5" — pull it out as the note.
   let note: string | undefined;
@@ -78,4 +74,12 @@ export async function scrapeKantin(): Promise<Restaurant> {
     menu,
     hours: HOURS,
   };
+}
+
+export async function scrapeKantin(): Promise<Restaurant> {
+  const res = await fetch(URL, {
+    headers: { "user-agent": "lunchlund/0.1 (+local tool)" },
+  });
+  if (!res.ok) throw new Error(`kantin: ${res.status} ${res.statusText}`);
+  return parseKantin(await res.text());
 }

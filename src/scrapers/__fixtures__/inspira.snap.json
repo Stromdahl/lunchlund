@@ -1,0 +1,86 @@
+{
+  "name": "Restaurang & Café Inspira",
+  "address": "Scheelevägen 4, Lund",
+  "website": "https://restauranginspira.se/",
+  "menu": [
+    {
+      "day": "Måndag",
+      "lines": [
+        "Green | Bakad getost & rostad potatis: tomat | oliver & kaprisyoghurt",
+        "Local | Kycklingbröst: rostad potatis | dragonmayo & tomatsallad",
+        "Asia | Karaage chicken: jasminris | morotssallad & limemayo",
+        "World | Ost & chilikorv: jalapeñofärskost | rostad potatis & majs"
+      ]
+    },
+    {
+      "day": "Tisdag",
+      "lines": [
+        "Green | Rajma masala: basmatiris & naan",
+        "Local | Rödtunga i vitvinssås: rom & gräslök | färskpotatis & broccoli",
+        "Asia | Karaage chicken: jasminris | morotssallad & limemayo",
+        "World | Kyckling Piccata: ris | tomatsås & rostad zucchini"
+      ]
+    },
+    {
+      "day": "Onsdag",
+      "lines": [
+        "Green | Hummus & Tabbouleh: baba ganoush & bakad morot",
+        "Local | Inspiras Kålpudding: gräddsås | lingon & spetskålsallad",
+        "Asia | Vindaloo på fläsk: basmatiris | yoghurt & broccoli",
+        "World | Kyckling Piccata: ris | tomatsås & rostad zucchini"
+      ]
+    },
+    {
+      "day": "Torsdag",
+      "lines": [
+        "Green | Shahi Pannoumi: okra & basmatiris",
+        "Local | Rostad kyckling: citron & körvelsås | potatisstomp & bakade morötter",
+        "Asia | Vindaloo på fläsk: basmatiris | yoghurt & broccoli",
+        "World | Pasulj (böngryta från Balkan): fetaost | feferoni & rostad potatis"
+      ]
+    },
+    {
+      "day": "Fredag",
+      "lines": [
+        "Green | Vårrullar: jordnötssås & nudlar",
+        "Local | Pytt Bellman: äggula | rödbetor & persilja",
+        "Asia | Buldak fire chicken: jasminris & Kimchi",
+        "World | Pasulj (böngryta från Balkan): fetaost | feferoni & rostad potatis"
+      ]
+    }
+  ],
+  "hours": {
+    "mon": [
+      {
+        "open": "11:30",
+        "close": "13:30"
+      }
+    ],
+    "tue": [
+      {
+        "open": "11:30",
+        "close": "13:30"
+      }
+    ],
+    "wed": [
+      {
+        "open": "11:30",
+        "close": "13:30"
+      }
+    ],
+    "thu": [
+      {
+        "open": "11:30",
+        "close": "13:30"
+      }
+    ],
+    "fri": [
+      {
+        "open": "11:30",
+        "close": "13:30"
+      }
+    ],
+    "sat": [],
+    "sun": []
+  }
+}

@@ -21,16 +21,11 @@ export type ElementorLunchOpts = {
   hours?: WeeklyHours;
 };
 
-export async function scrapeElementorLunch(
+export function parseElementorLunch(
+  html: string,
   opts: ElementorLunchOpts,
-): Promise<Restaurant> {
-  const res = await fetch(opts.url, {
-    headers: { "user-agent": "lunchlund/0.1 (+local tool)" },
-  });
-  if (!res.ok) {
-    throw new Error(`${opts.name}: ${res.status} ${res.statusText}`);
-  }
-  const $ = cheerio.load(await res.text());
+): Restaurant {
+  const $ = cheerio.load(html);
 
   const note = $(".week").first().text().replace(/\s+/g, " ").trim() || undefined;
 
@@ -71,4 +66,16 @@ export async function scrapeElementorLunch(
     menu,
     hours: opts.hours,
   };
+}
+
+export async function scrapeElementorLunch(
+  opts: ElementorLunchOpts,
+): Promise<Restaurant> {
+  const res = await fetch(opts.url, {
+    headers: { "user-agent": "lunchlund/0.1 (+local tool)" },
+  });
+  if (!res.ok) {
+    throw new Error(`${opts.name}: ${res.status} ${res.statusText}`);
+  }
+  return parseElementorLunch(await res.text(), opts);
 }

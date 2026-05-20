@@ -1,0 +1,83 @@
+{
+  "name": "Restaurang Edison",
+  "address": "Emdalavägen 6B, Lund",
+  "website": "https://restaurangedison.se/lunch/",
+  "note": "Vecka 21",
+  "price": "115:-",
+  "menu": [
+    {
+      "day": "Måndag",
+      "lines": [
+        "Green: Mexikansk majssoppa med kokos, quesadilla & paprikasallad",
+        "Local: Köttbullar med potatispuré, lingon, pressgurka & gräddsås",
+        "World Wide: Fried fish med sojamajo, ingefärspicklad morot & ris"
+      ]
+    },
+    {
+      "day": "Tisdag",
+      "lines": [
+        "Green: Dillpanerad tofu med remouladsås, potatis & krossade ärtor",
+        "Local: Grillad karré med sardellsky, persiljepotatis & olivsmör",
+        "World Wide: Chicken KungPao med broccoli, salladslök, cashewnöt & ris"
+      ]
+    },
+    {
+      "day": "Onsdag",
+      "lines": [
+        "Green: Okonomiyaki med bbqsås, sesammajo, nori & krispiga grönsaker",
+        "Local: Edisons burgare med tryffelmajo, cheddarost & pickles samt pommes",
+        "World Wide: Porchetta med rostad vitlök, het tomatsås & salviabakad potatis"
+      ]
+    },
+    {
+      "day": "Torsdag",
+      "lines": [
+        "Green: Spenatbiff med stekt ägg, senapscreme & klyftpotatis",
+        "Local: Dragen gris med fänkålssallad, rödlökscreme & kumminrostad potatis",
+        "World Wide: Lättbakad fisk med sushiris, sesampicklade grönsaker & wasabimajo"
+      ]
+    },
+    {
+      "day": "Fredag",
+      "lines": [
+        "Green: Krämig polenta med rostade vårpimörer & bladsallad med korngryn",
+        "Local: Grillat högrev med timjansrostade rotfrukter, rabarbchutney & citronsky",
+        "World Wide: Kyckling med nudlar, krispiga grönsaker, sesam & misobuljong"
+      ]
+    }
+  ],
+  "hours": {
+    "mon": [
+      {
+        "open": "11:15",
+        "close": "13:30"
+      }
+    ],
+    "tue": [
+      {
+        "open": "11:15",
+        "close": "13:30"
+      }
+    ],
+    "wed": [
+      {
+        "open": "11:15",
+        "close": "13:30"
+      }
+    ],
+    "thu": [
+      {
+        "open": "11:15",
+        "close": "13:30"
+      }
+    ],
+    "fri": [
+      {
+        "open": "11:15",
+        "close": "13:30"
+      }
+    ],
+    "sat": [],
+    "sun": []
+  }
+}

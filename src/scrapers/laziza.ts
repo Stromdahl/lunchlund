@@ -8,12 +8,8 @@ const URL = "https://www.laziza.se/lunch/";
 // label that the renderer treats as "today and the whole week".
 const WHOLE_WEEK_LABEL = "Hela veckan";
 
-export async function scrapeLaziza(): Promise<Restaurant> {
-  const res = await fetch(URL, {
-    headers: { "user-agent": "lunchlund/0.1 (+local tool)" },
-  });
-  if (!res.ok) throw new Error(`laziza: ${res.status} ${res.statusText}`);
-  const $ = cheerio.load(await res.text());
+export function parseLaziza(html: string): Restaurant {
+  const $ = cheerio.load(html);
 
   // The page header block has:
   //   <h1>Lunch</h1>
@@ -53,4 +49,12 @@ export async function scrapeLaziza(): Promise<Restaurant> {
     menu,
     hours: weekdayLunch("11:00", "14:00"),
   };
+}
+
+export async function scrapeLaziza(): Promise<Restaurant> {
+  const res = await fetch(URL, {
+    headers: { "user-agent": "lunchlund/0.1 (+local tool)" },
+  });
+  if (!res.ok) throw new Error(`laziza: ${res.status} ${res.statusText}`);
+  return parseLaziza(await res.text());
 }

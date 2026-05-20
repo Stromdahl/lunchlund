@@ -1,0 +1,82 @@
+{
+  "name": "Kantin",
+  "address": "Brunnshögsgatan 14, Lund",
+  "website": "https://www.kantinlund.se/",
+  "note": "Meny 18/5 – 22/5",
+  "menu": [
+    {
+      "day": "Måndag",
+      "lines": [
+        "Veckans vegetariska: Bakad portabello – belugalinser – zuccini – pickles – smetana – örter",
+        "Månadens alternativ: Guajillo bakad kycklinglårfilé – romansallad – jallapeñomajo – tomat – picklad lök – friterad tortilla – koriander",
+        "Pluma – rostad potatis – mojo rojo – aioli – paprika & svarta bönor – örter"
+      ]
+    },
+    {
+      "day": "Tisdag",
+      "lines": [
+        "Veckans vegetariska: Bakad portabello – belugalinser – zuccini – pickles – smetana – örter",
+        "Månadens alternativ: Guajillo bakad kycklinglårfilé – romansallad – jallapeñomajo – tomat – picklad lök – friterad tortilla – koriander",
+        "Nattbakad högrev – dragon majjo – kokt färskpotatis – pickles – bakad tomat – örter"
+      ]
+    },
+    {
+      "day": "Onsdag",
+      "lines": [
+        "Veckans vegetariska: Bakad portabello – belugalinser – zuccini – pickles – smetana – örter",
+        "Månadens alternativ: Guajillo bakad kycklinglårfilé – romansallad – jallapeñomajo – tomat – picklad lök – friterad tortilla – koriander",
+        "Yaki niku – entrecote – ris – siracha majjo – picklad kål – pak choi – böngroddar – koriander"
+      ]
+    },
+    {
+      "day": "Torsdag",
+      "lines": [
+        "Veckans vegetariska: Bakad portabello – belugalinser – zuccini – pickles – smetana – örter",
+        "Månadens alternativ: Guajillo bakad kycklinglårfilé – romansallad – jallapeñomajo – tomat – picklad lök – friterad tortilla – koriander",
+        "Råbiffstorsdag – oxtartar – tryffelaioli – rostad broccoli – picklad silverlök – parmesan – potatiscrisp – krasse"
+      ]
+    },
+    {
+      "day": "Fredag",
+      "lines": [
+        "Veckans vegetariska: Bakad portabello – belugalinser – zuccini – pickles – smetana – örter",
+        "Månadens alternativ: Guajillo bakad kycklinglårfilé – romansallad – jallapeñomajo – tomat – picklad lök – friterad tortilla – koriander",
+        "Porkbelly – bbqsås – chipotlemajjo – rostad potatis – kålsallad – persilja"
+      ]
+    }
+  ],
+  "hours": {
+    "mon": [
+      {
+        "open": "11:00",
+        "close": "15:00"
+      }
+    ],
+    "tue": [
+      {
+        "open": "11:00",
+        "close": "15:00"
+      }
+    ],
+    "wed": [
+      {
+        "open": "11:00",
+        "close": "15:00"
+      }
+    ],
+    "thu": [
+      {
+        "open": "11:00",
+        "close": "15:00"
+      }
+    ],
+    "fri": [
+      {
+        "open": "11:00",
+        "close": "15:00"
+      }
+    ],
+    "sat": [],
+    "sun": []
+  }
+}

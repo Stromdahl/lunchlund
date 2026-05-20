@@ -9,12 +9,8 @@ const URL = "https://www.troppo.se/lunch";
 // today's menu on any weekday.
 const WHOLE_WEEK_LABEL = "Hela veckan";
 
-export async function scrapeTroppo(): Promise<Restaurant> {
-  const res = await fetch(URL, {
-    headers: { "user-agent": "lunchlund/0.1 (+local tool)" },
-  });
-  if (!res.ok) throw new Error(`troppo: ${res.status} ${res.statusText}`);
-  const $ = cheerio.load(await res.text());
+export function parseTroppo(html: string): Restaurant {
+  const $ = cheerio.load(html);
 
   // Week heading is "Lunch Week NN, YYYY".
   let note: string | undefined;
@@ -80,4 +76,12 @@ export async function scrapeTroppo(): Promise<Restaurant> {
     menu,
     hours: weekdayLunch("11:00", "14:00"),
   };
+}
+
+export async function scrapeTroppo(): Promise<Restaurant> {
+  const res = await fetch(URL, {
+    headers: { "user-agent": "lunchlund/0.1 (+local tool)" },
+  });
+  if (!res.ok) throw new Error(`troppo: ${res.status} ${res.statusText}`);
+  return parseTroppo(await res.text());
 }

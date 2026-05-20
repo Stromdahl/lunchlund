@@ -1,0 +1,47 @@
+{
+  "menu": [
+    {
+      "day": "Måndag",
+      "lines": [
+        "Cevapcici med lök, tomat, färskostkräm, ajvar, friterade pommes med chilisalt & pitabröd",
+        "Stekt kungsfisk med potatis caesar style, roman, bacon, lagrad ost & brödkrisp, pepparrotskräm",
+        "Cannelloni med ricotta och spenat, tomat-chilisallad, ruccola & krispig lök"
+      ]
+    },
+    {
+      "day": "Tisdag",
+      "lines": [
+        "Pytt i panna med stekt ägg, senapskräm & inlagda rödbetor",
+        "Grön kokosgryta med scampi, musslor, sej, picklad lök, jordnötter, rostad kokos & jasminris",
+        "Halloumi masala med mynta, mango raita, sötsyrlig paprikasallad, basmatiris",
+        "Sweet Tuesday: Vi bjuder på något sött till kaffet!"
+      ]
+    },
+    {
+      "day": "Onsdag",
+      "lines": [
+        "Soja, honung & sesammarinerad kyckling med mango, chili, lime & glasnudlar, spicy majo, lökkrisp",
+        "Panerad fisk med remouladsås, kokt potatis med dill & brynt smör, sockerärtor, rädisa och morot",
+        "Morot och fetaostbiffar med vattenmelonsallad, ingefärs majo, rostad chilipotatis"
+      ]
+    },
+    {
+      "day": "Torsdag",
+      "lines": [
+        "Nattbakad pepparkarré med brynt lök sky, stekt potatis med lök, äpple & bacon, rostad rotfruktssallad",
+        "Sej i masalasås med mangochutney, kokos, mynta ripple & rostad pumpa, basmatiris",
+        "Stekt gnocchi med krämig tomat-basilika sås, marinerad zucchini-olivsallad, lagrad ost",
+        "Pancake Thursday: Vi bjuder på pannkakor, lättvispad grädde och hemmagjord sylt!"
+      ]
+    },
+    {
+      "day": "Fredag",
+      "lines": [
+        "Högrevsburgare med cheddar, karamelliserad lök, jalapenomajo & pommes med lagrad ost",
+        "Krispig fiskbiff med sushiris, teriyakiglaze, sesamrostad broccoli & picklad ingefärsmajo",
+        "Quesadilla med cheddar, jalapeno, koriander, paprika, het lime & rökt chilidippa, rostad majssalsa, ris"
+      ]
+    }
+  ],
+  "week": "Lunchmeny V21"
+}

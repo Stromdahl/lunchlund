@@ -16,10 +16,11 @@ const DAY_DISPLAY: Record<string, string> = {
 };
 
 export async function scrapeEatery(): Promise<Restaurant> {
-  const { pdfUrl, price } = await scrapeLandingPage();
+  const html = await fetchText(PAGE_URL, "eatery page");
+  const { pdfUrl, price } = parseEateryLanding(html);
   const pdf = await fetchPdf(pdfUrl);
   const text = await pdfToText(pdf);
-  const { menu, week } = parseMenu(text);
+  const { menu, week } = parseEateryMenu(text);
 
   return {
     name: "Eatery Lund",
@@ -32,15 +33,19 @@ export async function scrapeEatery(): Promise<Restaurant> {
   };
 }
 
-async function scrapeLandingPage(): Promise<{
-  pdfUrl: string;
-  price?: string;
-}> {
-  const res = await fetch(PAGE_URL, {
+async function fetchText(url: string, label: string): Promise<string> {
+  const res = await fetch(url, {
     headers: { "user-agent": "lunchlund/0.1 (+local tool)" },
   });
-  if (!res.ok) throw new Error(`eatery page: ${res.status} ${res.statusText}`);
-  const $ = cheerio.load(await res.text());
+  if (!res.ok) throw new Error(`${label}: ${res.status} ${res.statusText}`);
+  return res.text();
+}
+
+export function parseEateryLanding(html: string): {
+  pdfUrl: string;
+  price?: string;
+} {
+  const $ = cheerio.load(html);
 
   // Pick the first link to a Lund_sv_V*.pdf — the Swedish weekly menu.
   let pdfUrl: string | undefined;
@@ -114,7 +119,10 @@ function pdfToText(pdf: Buffer): Promise<string> {
   });
 }
 
-function parseMenu(text: string): { menu: DayMenu[]; week?: string } {
+export function parseEateryMenu(text: string): {
+  menu: DayMenu[];
+  week?: string;
+} {
   const lines = text.split(/\r?\n/).map((l) => l.trim());
 
   const weekMatch = text.match(/MENY\s+V(\d+)/i);

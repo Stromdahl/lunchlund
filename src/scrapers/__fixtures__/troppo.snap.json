@@ -1,0 +1,51 @@
+{
+  "name": "Troppo",
+  "address": "Brunnshögsgatan 34, Lund",
+  "website": "https://www.troppo.se/lunch",
+  "note": "Lunch Week 20, 2026",
+  "price": "149–159kr",
+  "menu": [
+    {
+      "day": "Hela veckan",
+      "lines": [
+        "Sri Lankan Curry — made fresh this morning with garam masala, turmeric, coconut milk, pandan, cinnamon, broccolini, chili, cardamom, pumpkin & chick peas",
+        "Stir-fried Beef — Velvety beef prepared á lá minute, cashew nuts, oyster sauce, scallions, deep fried chili.Served with steamed jasmine rice. (Chinese)",
+        "Deep Fried Haddock — the lovliest combination of lemongrass, garlic, tomato, fish sauce, lime, chili, spicey carrot salad & peanuts."
+      ]
+    }
+  ],
+  "hours": {
+    "mon": [
+      {
+        "open": "11:00",
+        "close": "14:00"
+      }
+    ],
+    "tue": [
+      {
+        "open": "11:00",
+        "close": "14:00"
+      }
+    ],
+    "wed": [
+      {
+        "open": "11:00",
+        "close": "14:00"
+      }
+    ],
+    "thu": [
+      {
+        "open": "11:00",
+        "close": "14:00"
+      }
+    ],
+    "fri": [
+      {
+        "open": "11:00",
+        "close": "14:00"
+      }
+    ],
+    "sat": [],
+    "sun": []
+  }
+}

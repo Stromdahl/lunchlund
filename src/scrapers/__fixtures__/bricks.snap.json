@@ -1,0 +1,85 @@
+{
+  "name": "Bricks Eatery",
+  "address": "Mobilvägen 12, Lund",
+  "website": "https://brickseatery.se/",
+  "note": "Lunchmeny V21",
+  "price": "115:- ink. Kaffe",
+  "menu": [
+    {
+      "day": "Måndag",
+      "lines": [
+        "Green: Pasta med citronsås, chilirostad zucchini, bladspenat, chiliolja, lagrad ost och vitlök",
+        "Local: Kroppkakor med lingon, brynt kål, mandel, brynt smör och persilja",
+        "World wide: Stekt kyckling med baconmajonnäs, lagrad ost, vitlökskrutonger, romansallad, picklad lök och rostad potatis"
+      ]
+    },
+    {
+      "day": "Tisdag",
+      "lines": [
+        "Green: Indisk Aloo- gobi med naanbröd, ris, potatis, blomkål, grädde, kikärtor och spenat",
+        "World Wide: Crispy beef med ostronsås, lök, paprika, ris, sesam och böngroddar",
+        "Pizza: Mozzarella, creme-fraiche, guanciale, lagrad ost och svartpeppar"
+      ]
+    },
+    {
+      "day": "Onsdag",
+      "lines": [
+        "Green: Vegetarisk gulaschgryta med sojaprotein, paprika, potatis, vitlöksbröd, syrad grädde och picklad lök",
+        "World Wide: Dagens fångst med grön curry, grönsaker, ris, lime och jordnötter",
+        "Local: Nattbakad fläskkarre med rostad potatis, purjolök, svampsås, svartvinbärsgelé och picklad gurka",
+        "Pizza: Mozzarella, creme-fraiche, guanciale, lagrad ost och svartpeppar"
+      ]
+    },
+    {
+      "day": "Torsdag",
+      "lines": [
+        "Green: Grönsaksbiff med nudelsallad, chilimajonnäs, rostade grönsaker, cashew/jordnötter och koriander",
+        "World Wide: Hoisinglacerade revben med ris, sojamajonnäs, picklad ingefära och asiatisk råkostsallad",
+        "Pizza: Mozzarella, creme-fraiche, guanciale, lagrad ost och svartpeppar",
+        "Äppelpaj: Varje torsdag bjuder vi på äppelpaj med vaniljgrädde till våra lunchgäster"
+      ]
+    },
+    {
+      "day": "Fredag",
+      "lines": [
+        "Green: Fylld aubergine med krämig ost, tomatsallad, gurka och vitlökskrutonger",
+        "Local: Mix grill ( kyckling, kalv, stark korv) med ramslöksbearnaise, pommes och tomatsallad",
+        "World wide: Fylld paprika \"balkan style\" med ost, lök, fläskfärs, tomat och persilja"
+      ]
+    }
+  ],
+  "hours": {
+    "mon": [
+      {
+        "open": "11:00",
+        "close": "13:30"
+      }
+    ],
+    "tue": [
+      {
+        "open": "11:00",
+        "close": "13:30"
+      }
+    ],
+    "wed": [
+      {
+        "open": "11:00",
+        "close": "13:30"
+      }
+    ],
+    "thu": [
+      {
+        "open": "11:00",
+        "close": "13:30"
+      }
+    ],
+    "fri": [
+      {
+        "open": "11:00",
+        "close": "13:30"
+      }
+    ],
+    "sat": [],
+    "sun": []
+  }
+}
