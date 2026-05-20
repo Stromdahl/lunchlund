@@ -67,6 +67,10 @@ export function parseKantin(html: string): ScrapedData {
     for (const d of menu) d.lines = [...prefix, ...d.lines];
   }
 
+  if (menu.length === 0) {
+    throw new Error("kantin: no day paragraphs found");
+  }
+
   return { note, menu, hours: HOURS };
 }
 
