@@ -95,10 +95,27 @@ function renderItem(line: string): string {
   return `<li class="${cls}">${tag}${esc(it.text)}</li>`;
 }
 
-function renderWeekDay(day: string, lines: string[]): string {
-  return `<div class="week-day"><p class="week-day-title">${esc(day)}</p><ul class="items">${lines
-    .map(renderItem)
-    .join("")}</ul></div>`;
+const VIEW_DAYS: WeekdayKey[] = ["mon", "tue", "wed", "thu", "fri"];
+
+// Per-card serialised menu: each weekday → tag-split items. The day-bar JS
+// reads this to swap the visible items when another day is picked.
+function menuAttr(r: Restaurant): string {
+  const out: Record<string, Item[]> = {};
+  for (const day of VIEW_DAYS) {
+    const sv = daySv(day);
+    const dm = r.menu.find((m) => m.day === sv);
+    out[day] = dm ? dm.lines.map(splitItem) : [];
+  }
+  return esc(JSON.stringify(out));
+}
+
+function renderDayBar(activeKey: WeekdayKey): string {
+  const btns = VIEW_DAYS.map((k) => {
+    const isActive = k === activeKey;
+    const cls = `daybtn${isActive ? " is-today" : ""}`;
+    return `<button type="button" class="${cls}" data-day="${k}" aria-pressed="${isActive}">${esc(daySv(k))}</button>`;
+  }).join("");
+  return `<nav class="daybar" aria-label="Veckodag"><div class="daybar-inner" id="daybar">${btns}</div></nav>`;
 }
 
 function renderCard(r: Restaurant, todayKey: WeekdayKey): string {
@@ -107,16 +124,13 @@ function renderCard(r: Restaurant, todayKey: WeekdayKey): string {
   const todayName = daySv(todayKey);
 
   // Today's menu entry: whole-week takes the lone entry; weekdays match by
-  // Swedish day name; weekends have no "today" — the disclosure carries the
-  // full week instead.
+  // Swedish day name; weekends fall back to nothing — the day-bar lets the
+  // viewer pick another day.
   const todayEntry = wholeWeek
     ? r.menu[0]
     : isWeekend
       ? null
       : (r.menu.find((m) => m.day === todayName) ?? null);
-  const restOfWeek = wholeWeek
-    ? []
-    : r.menu.filter((m) => m !== todayEntry);
   const todayLines = todayEntry?.lines ?? [];
   const todayHrs = hoursTodayLabel(r.hours, todayKey);
 
@@ -134,14 +148,13 @@ function renderCard(r: Restaurant, todayKey: WeekdayKey): string {
     ? `<a href="${esc(r.website)}" rel="noopener">webbplats ↗</a>`
     : "";
 
-  // The IDAG/HELA VECKAN strip now lives inside .when (same row as hours +
-  // pill). On weekend builds the left side is empty; hours and pill float
-  // right via margin-left:auto on .hours.
+  // The IDAG/HELA VECKAN strip lives inside .when. "IDAG · " is wrapped so
+  // the day-bar JS can hide it when the viewer picks a day other than today.
   const leftLabel = wholeWeek
     ? `<span>HELA VECKAN</span>`
     : isWeekend
       ? ""
-      : `<span>IDAG</span><span class="sep">·</span><span class="day">${esc(
+      : `<span class="idag-prefix"><span>IDAG</span><span class="sep">·</span></span><span class="day">${esc(
           todayName.toUpperCase(),
         )}</span>`;
 
@@ -149,17 +162,12 @@ function renderCard(r: Restaurant, todayKey: WeekdayKey): string {
     ? `<p class="wholeweek">Samma meny mån–fre.</p>`
     : "";
 
-  const itemsBlock = todayLines.length
-    ? `<ul class="items">${todayLines.map(renderItem).join("")}</ul>`
-    : "";
+  const itemsBlock = `<ul class="items">${todayLines.map(renderItem).join("")}</ul>`;
 
-  const disclosure = restOfWeek.length
-    ? `<details class="week"${isWeekend ? " open" : ""}><summary>Resten av veckan</summary>${restOfWeek
-        .map((d) => renderWeekDay(d.day, d.lines))
-        .join("")}</details>`
-    : "";
+  // Whole-week and weekend cards aren't day-switchable, so no data-menu.
+  const menuData = wholeWeek || isWeekend ? "" : ` data-menu="${menuAttr(r)}"`;
 
-  return `<li class="card" data-hours="${hoursAttr(r.hours)}">
+  return `<li class="card" data-hours="${hoursAttr(r.hours)}"${menuData}>
     <div class="head">
       <h2 class="name">${esc(r.name)}</h2>
       ${note}
@@ -176,7 +184,6 @@ function renderCard(r: Restaurant, todayKey: WeekdayKey): string {
     </div>
     ${wholeWeekBanner}
     ${itemsBlock}
-    ${disclosure}
   </li>`;
 }
 
@@ -231,6 +238,17 @@ a:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:3p
 .top .dateline .sep{color:var(--ink-3)}
 .top .dateline .live{display:inline-flex;align-items:center;gap:6px;color:var(--ink);font-weight:500}
 .top .dateline .live .dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px var(--ok-soft)}
+.daybar{margin:14px 0 6px;padding:4px;background:var(--paper-1);border:1px solid var(--hair);border-radius:12px;box-shadow:0 1px 0 oklch(100% 0 0 / 0.4) inset,0 1px 2px oklch(22% 0.022 50 / 0.04);position:sticky;top:8px;z-index:4}
+.daybar-inner{display:grid;grid-template-columns:repeat(5,1fr);gap:0}
+.daybtn{appearance:none;border:0;background:transparent;font-family:inherit;cursor:pointer;padding:11px 8px 13px;border-radius:9px;position:relative;color:var(--ink-3);font-size:14.5px;font-weight:600;letter-spacing:-.005em;transition:color .14s ease,background .14s ease;outline:none}
+.daybtn:hover{color:var(--ink)}
+.daybtn:focus-visible{box-shadow:0 0 0 2px var(--accent) inset}
+.daybtn.is-today::after{content:'';position:absolute;left:50%;bottom:4px;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--accent)}
+.daybtn[aria-pressed="true"]{background:var(--ink);color:var(--paper-1);box-shadow:0 1px 2px oklch(0% 0 0 / 0.12)}
+.daybtn[aria-pressed="true"]:hover{color:var(--paper-1)}
+.daybtn.is-today[aria-pressed="true"]::after{background:var(--paper-1)}
+.idag-prefix{display:contents}
+.when[data-not-today] [data-state-pill]{display:none}
 .cards{margin:12px 0 0;display:flex;flex-direction:column;gap:10px;list-style:none;padding:0}
 .card{background:var(--paper-1);border:1px solid var(--hair);border-radius:var(--radius);padding:14px 14px 12px;box-shadow:0 1px 0 oklch(100% 0 0 / .5) inset,0 1px 2px oklch(14% 0 0 / .04),0 6px 20px -16px oklch(14% 0 0 / .18)}
 .head{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin:0}
@@ -255,18 +273,6 @@ a:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:3p
 .item .tag::after{content:':';margin-right:4px;color:var(--ink-3)}
 .item.no-tag .tag{display:none}
 .wholeweek{margin:4px 0 0;font-size:12px;color:var(--ink-2);font-style:italic}
-.week{margin-top:8px}
-.week>summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:4px 9px 4px 7px;margin-left:-7px;font-size:12.5px;color:var(--ink-2);font-weight:500;border-radius:7px}
-.week>summary:hover{background:var(--paper-2);color:var(--ink)}
-.week>summary::-webkit-details-marker{display:none}
-.week>summary::before{content:'▸';color:var(--accent);transition:transform .15s ease}
-.week[open]>summary::before{transform:rotate(90deg)}
-.week-day{margin-top:8px}
-.week-day-title{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin:0 0 3px}
-.week-day .items{padding-left:13px}
-.week-day .item{padding:2px 0;font-size:12.5px;color:var(--ink-2)}
-.week-day .item::before{background:var(--ink-3);top:9px;width:3px;height:3px}
-.week-day .item .tag{color:var(--ink-2)}
 .scrape-fail{margin:10px 0 0;padding:12px 14px;background:var(--bad-soft);border:1px solid var(--hair);border-radius:10px;font-size:13.5px;color:var(--ink-2);display:flex;align-items:flex-start;gap:10px}
 .scrape-fail .ico{color:var(--bad);font-weight:800;line-height:1.3}
 .scrape-fail .errwhen{margin-top:4px;font-size:11.5px;color:var(--ink-3);letter-spacing:.04em}
@@ -283,6 +289,7 @@ function inlineScript(buildDayKey: WeekdayKey): string {
   return `(function(){
 const BUILD_DAY=${JSON.stringify(buildDayKey)};
 const DAY_NAMES={mon:'Måndag',tue:'Tisdag',wed:'Onsdag',thu:'Torsdag',fri:'Fredag',sat:'Lördag',sun:'Söndag'};
+const VIEW_DAYS=['mon','tue','wed','thu','fri'];
 function nowSthlm(){
   const p=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Stockholm',weekday:'short',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(new Date());
   const g=t=>p.find(x=>x.type===t).value;
@@ -290,8 +297,13 @@ function nowSthlm(){
 }
 function toMins(h){const[a,b]=h.split(':').map(Number);return a*60+b}
 function fmt(s){return s[0]+'–'+s[1]}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
+function renderItem(it){
+  const tag=it.tag?'<span class="tag">'+esc(it.tag)+'</span>':'';
+  const cls=it.tag?'item':'item no-tag';
+  return '<li class="'+cls+'">'+tag+esc(it.text)+'</li>';
+}
 const t=nowSthlm();
-const weekend=(t.day==='sat'||t.day==='sun');
 document.querySelectorAll('.card[data-hours]').forEach(el=>{
   let h;try{h=JSON.parse(el.getAttribute('data-hours'))}catch(e){return}
   const slots=h[t.day]||[];
@@ -308,11 +320,39 @@ document.querySelectorAll('.card[data-hours]').forEach(el=>{
 });
 const dayEl=document.querySelector('[data-today-day]');
 if(dayEl&&t.day!==BUILD_DAY)dayEl.textContent=DAY_NAMES[t.day];
-if(t.day!==BUILD_DAY){
-  const dn=(DAY_NAMES[t.day]||'').toUpperCase();
-  document.querySelectorAll('.when .day').forEach(el=>{el.textContent=dn});
+document.querySelectorAll('.daybtn').forEach(b=>{
+  b.classList.toggle('is-today',b.dataset.day===t.day);
+});
+function applyDay(dayKey){
+  document.querySelectorAll('.daybtn').forEach(b=>{
+    b.setAttribute('aria-pressed',b.dataset.day===dayKey?'true':'false');
+  });
+  document.querySelectorAll('.card[data-menu]').forEach(card=>{
+    let menu;try{menu=JSON.parse(card.getAttribute('data-menu'))}catch(e){return}
+    let hours;try{hours=JSON.parse(card.getAttribute('data-hours'))}catch(e){return}
+    const items=menu[dayKey]||[];
+    const itemsEl=card.querySelector('.items');
+    if(itemsEl)itemsEl.innerHTML=items.map(renderItem).join('');
+    const dayLabel=card.querySelector('.when .day');
+    if(dayLabel)dayLabel.textContent=(DAY_NAMES[dayKey]||'').toUpperCase();
+    const hoursEl=card.querySelector('[data-today-hours]');
+    if(hoursEl){
+      const slots=hours[dayKey]||[];
+      hoursEl.textContent=slots.length?fmt(slots[0]):'stängt';
+    }
+    const prefix=card.querySelector('.idag-prefix');
+    if(prefix)prefix.style.display=(dayKey===t.day)?'':'none';
+    const when=card.querySelector('.when');
+    if(when){
+      if(dayKey===t.day)when.removeAttribute('data-not-today');
+      else when.setAttribute('data-not-today','');
+    }
+  });
 }
-if(weekend)document.querySelectorAll('details.week').forEach(d=>d.setAttribute('open',''));
+document.querySelectorAll('.daybtn').forEach(b=>{
+  b.addEventListener('click',function(){applyDay(b.dataset.day)});
+});
+if(VIEW_DAYS.indexOf(t.day)!==-1)applyDay(t.day);
 })();`;
 }
 
@@ -361,6 +401,7 @@ export function render(result: ScrapeResult): string {
 <span data-today-day>${esc(todayDayName)}</span>
 </div>
 </header>
+${renderDayBar(VIEW_DAYS.includes(todayKey) ? todayKey : "mon")}
 <ol class="cards">
 ${cards}
 </ol>
