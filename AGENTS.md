@@ -92,6 +92,15 @@ Lebanese buffet, no per-day menu — same single "Hela veckan" entry as
 Troppo. Price + buffet label are parsed from the page; hours hardcoded for
 the Lund branch (Scheelevägen 15K).
 
+### Aiko Sushi Brunnshög — `https://www.aikosushi.se/lunch`
+
+Fixed Mon–Fri lunch offering with four category sections (Sushi, Sushi Dog,
+Varmrätter, Poké Bowls) and per-portion price tables. Modelled as a single
+"Hela veckan" entry. The parser verifies the four section H2s exist and
+captures the "Inkl. misosoppa, vatten & kaffe" note; the line strings are
+curated since the page is mostly fixed copy + price tables. Throws if the
+"Lunch Erbjudande" header or any category section H2 disappears.
+
 ## Failure modes & how to tell
 
 `scrapeAll` returns `{ fetchedAt, restaurants }` where each `Restaurant`

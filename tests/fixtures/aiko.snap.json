@@ -1,0 +1,50 @@
+{
+  "note": "Inkl. misosoppa, vatten & kaffe",
+  "price": "80–149kr",
+  "menu": [
+    {
+      "day": "Hela veckan",
+      "lines": [
+        "Mixad sushi: 109/129/149kr (11/13/16 bitar) · finns vegetarisk",
+        "Mixad nigiri: 119/139kr (9/12 bitar) · finns vegetarisk",
+        "Sushi Dog: 80kr to-go / 95kr eat-in · 8 fyllningar att välja",
+        "Varmrätt: wokade udon nudlar 119kr (kyckling eller tofu)",
+        "Poké Bowl: 129kr kall / 139kr varm"
+      ]
+    }
+  ],
+  "hours": {
+    "mon": [
+      {
+        "open": "11:00",
+        "close": "14:30"
+      }
+    ],
+    "tue": [
+      {
+        "open": "11:00",
+        "close": "14:30"
+      }
+    ],
+    "wed": [
+      {
+        "open": "11:00",
+        "close": "14:30"
+      }
+    ],
+    "thu": [
+      {
+        "open": "11:00",
+        "close": "14:30"
+      }
+    ],
+    "fri": [
+      {
+        "open": "11:00",
+        "close": "14:30"
+      }
+    ],
+    "sat": [],
+    "sun": []
+  }
+}

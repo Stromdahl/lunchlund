@@ -6,6 +6,7 @@ import { edison } from "./edison";
 import { inspira } from "./inspira";
 import { troppo } from "./troppo";
 import { laziza } from "./laziza";
+import { aiko } from "./aiko";
 
 export const SCRAPERS: ScraperDescriptor[] = [
   bricks,
@@ -15,4 +16,5 @@ export const SCRAPERS: ScraperDescriptor[] = [
   inspira,
   troppo,
   laziza,
+  aiko,
 ];
