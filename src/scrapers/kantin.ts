@@ -24,30 +24,41 @@ export function parseKantin(html: string): ScrapedData {
     }
   });
 
-  // Each day is a <p> whose first child is a <strong>. Two shapes appear:
+  // Each day is a <p> whose leading bold text is a day label. Shapes seen:
   //   <strong>Måndag </strong>dish text…
   //   <strong>Veckans vegetariska </strong>dish text…
   //   <strong>Månadens alternativ <span style="font-weight:400">dish…</span></strong>
-  // The last one keeps the dish inside the strong via a non-bold span, so
-  // peeking only at strong.text() isn't enough — match on the full paragraph
-  // text against the known label prefixes. Skip paragraphs where the strong
-  // is plain body text (e.g. "Måndag till fredag kl. 11–16").
+  //   <p><span…><span…><strong>måndag</strong> – dish text…</span></p>
+  // The last shape (content pasted from webmail) wraps the bold in nested
+  // <span>s and separates the dish with an en-dash, so it isn't a direct child
+  // and the day name is lowercased. Webmail/Word paste also emits <b> as often
+  // as <strong>, so accept either. Find the bold anywhere in the paragraph and
+  // require its text to lead the paragraph — that skips body paragraphs where a
+  // day word isn't bold (e.g. the theme's "Måndag till fredag kl. 11–16" hours
+  // line) and the contact line's bolded <b>info@…</b> email. Match on the full
+  // paragraph text since Månadens keeps its dish inside the strong via a
+  // non-bold span.
   const menu: DayMenu[] = [];
   const extras = new Map<string, string>();
   $("p").each((_, p) => {
     const para = $(p);
-    const strong = para.children("strong").first();
-    if (!strong.length) return;
-    if (para.contents().first().get(0) !== strong.get(0)) return;
+    const bold = para.find("strong, b").first();
+    if (!bold.length) return;
 
     const full = cleanText(para.text());
     if (!full) return;
+    const lead = cleanText(bold.text());
+    if (!lead || !full.startsWith(lead)) return;
 
     const day = DAYS.find((d) =>
       new RegExp(`^${d}\\b`, "i").test(full),
     );
     if (day) {
-      const rest = full.replace(new RegExp(`^${day}\\s+`, "i"), "").trim();
+      // Strip the day label and any following separator: whitespace, colon, or
+      // any hyphen/dash variant (ASCII -, U+2010–2015, minus sign U+2212).
+      const rest = full
+        .replace(new RegExp(`^${day}[\\s:\\u2010-\\u2015\\u2212-]+`, "i"), "")
+        .trim();
       if (rest) menu.push({ day, lines: [rest] });
       return;
     }

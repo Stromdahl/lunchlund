@@ -67,9 +67,26 @@ MENY / LUND / salladsbuffé / app-rabatt lines).
 
 ### Kantin — `https://www.kantinlund.se/`
 
-Plain WordPress. Each day is a `<p>` whose first child is a `<strong>` with
-the day name. Two whole-week extras share the paragraph shape and are
-prepended to every day's lines:
+Plain WordPress. Each day is a `<p>` whose **leading bold text** is a day
+label. The parser finds the bold (`<strong>` or `<b>`) anywhere in the
+paragraph (not just as a direct child) and requires its text to lead the
+paragraph — that tolerates the observed shapes and skips bold body content
+that doesn't lead with a day (e.g. the theme's "Måndag till fredag kl. 11–16"
+hours line and the contact line's `<b>info@…</b>` email):
+
+- Hand-typed: `<strong>Måndag </strong>dish…` (capitalised, dish follows).
+- Pasted from webmail: `<p><span…><strong>måndag</strong> – dish…</span></p>`
+  — the strong is buried in nested `oneComWebmail-*` `<span>`s, the day name
+  is lowercased, and an en-dash separates the dish. (This layout broke the
+  2026-06-01 cron run.)
+
+The day-label strip consumes any trailing run of whitespace, colon, or
+hyphen/dash variant before the dish. Both shapes — plus `<b>` labels and a
+colon separator — have fixture-backed snapshots (`kantin.html`,
+`kantin-webmail.html`).
+
+Two whole-week extras share the paragraph shape and are prepended to every
+day's lines:
 
 - "Veckans vegetariska": `<strong>Veckans vegetariska </strong>dish…`
 - "Månadens alternativ": `<strong>Månadens alternativ <span style="font-weight:400">dish</span></strong>`

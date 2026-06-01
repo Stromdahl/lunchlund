@@ -1,0 +1,79 @@
+{
+  "note": "Meny 1/6 – 5/6",
+  "menu": [
+    {
+      "day": "Måndag",
+      "lines": [
+        "Veckans vegetariska: Halloumi – citronaioli – sallad – broccoli – bönor – rädisor – frökrisp – dill",
+        "Månadens alternativ: Varmrökt lax – citronaioli – sallad – broccoli – bönor – rädisor – frökrisp – dill",
+        "Kycklingsteak – potatis – rödcurrymajo – sockerärtor – pujolök – böngroddar – pickles"
+      ]
+    },
+    {
+      "day": "Tisdag",
+      "lines": [
+        "Veckans vegetariska: Halloumi – citronaioli – sallad – broccoli – bönor – rädisor – frökrisp – dill",
+        "Månadens alternativ: Varmrökt lax – citronaioli – sallad – broccoli – bönor – rädisor – frökrisp – dill",
+        "Flankstek – ris – krossad chili & sesamgurka – sojabönor – sotad chilimajo – rostad lök – koriander"
+      ]
+    },
+    {
+      "day": "Onsdag",
+      "lines": [
+        "Veckans vegetariska: Halloumi – citronaioli – sallad – broccoli – bönor – rädisor – frökrisp – dill",
+        "Månadens alternativ: Varmrökt lax – citronaioli – sallad – broccoli – bönor – rädisor – frökrisp – dill",
+        "Nattbakad fläsksida – potatisstomp – äpplecidersås – bakad rotselleri – pumpakärnor – pickles – örter"
+      ]
+    },
+    {
+      "day": "Torsdag",
+      "lines": [
+        "Veckans vegetariska: Halloumi – citronaioli – sallad – broccoli – bönor – rädisor – frökrisp – dill",
+        "Månadens alternativ: Varmrökt lax – citronaioli – sallad – broccoli – bönor – rädisor – frökrisp – dill",
+        "Oxtartar – harissamajo – rostad paprika – syrad rödlök – rostade frön – soltorkad tomat – persilja"
+      ]
+    },
+    {
+      "day": "Fredag",
+      "lines": [
+        "Veckans vegetariska: Halloumi – citronaioli – sallad – broccoli – bönor – rädisor – frökrisp – dill",
+        "Månadens alternativ: Varmrökt lax – citronaioli – sallad – broccoli – bönor – rädisor – frökrisp – dill",
+        "Nattbakad oxkind – rostad potatis – aioli – ndujasky – sparrisbroccoli – buntmorot – rökt mandel – örter"
+      ]
+    }
+  ],
+  "hours": {
+    "mon": [
+      {
+        "open": "11:00",
+        "close": "15:00"
+      }
+    ],
+    "tue": [
+      {
+        "open": "11:00",
+        "close": "15:00"
+      }
+    ],
+    "wed": [
+      {
+        "open": "11:00",
+        "close": "15:00"
+      }
+    ],
+    "thu": [
+      {
+        "open": "11:00",
+        "close": "15:00"
+      }
+    ],
+    "fri": [
+      {
+        "open": "11:00",
+        "close": "15:00"
+      }
+    ],
+    "sat": [],
+    "sun": []
+  }
+}
