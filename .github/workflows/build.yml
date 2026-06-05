@@ -4,7 +4,12 @@ on:
   push:
     branches: [main]
   schedule:
-    - cron: '17 0 * * 1-5'
+    # 03:17 dodges a nightly window (~00:00–02:00 Stockholm) where the
+    # one.com-hosted sites returned 503 and the GlobalConnect-hosted ones
+    # 415 (Jun 3–5 2026); daytime runs from the same runners were fine.
+    # Cause unconfirmed — if failures recur at 03:17, suspect IP-based
+    # bot blocking rather than a time window.
+    - cron: '17 3 * * 1-5'
       timezone: "Europe/Stockholm"
   workflow_dispatch:
 

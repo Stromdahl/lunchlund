@@ -129,6 +129,16 @@ Most likely things to break:
 - A site redesigns and drops the CSS classes the parser keys on.
 - Eatery changes the PDF filename pattern (no longer `Lund_sv_V*.pdf`).
 - `pdftotext` is missing on the host (Eatery only).
+- The scheduled build lands in a nightly window (~00:00–02:00 Stockholm,
+  observed 2026-06-03…05) where the hosts reject requests: `503` from
+  one.com (Kantin, Laziza), `415` from GlobalConnect (Bricks, Edison,
+  Inspira, Aiko). Daytime runs from the same GitHub runners were fine,
+  so it's host-side and time-correlated — but the cause (maintenance vs.
+  bot mitigation) is unconfirmed. The cron is at 03:17 Stockholm to stay
+  clear; if error cards appear anyway, `gh workflow run build.yml`
+  during the day fixes the page (in-build retries won't outlast a
+  multi-hour window), and recurring 03:17 failures would point at
+  IP-based blocking instead.
 
 ## Tests
 
