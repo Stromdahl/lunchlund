@@ -118,12 +118,46 @@ captures the "Inkl. misosoppa, vatten & kaffe" note; the line strings are
 curated since the page is mostly fixed copy + price tables. Throws if the
 "Lunch Erbjudande" header or any category section H2 disappears.
 
+## Resilience
+
+Three layers soften a scrape failure, in order of how much they help the
+person looking at the live page:
+
+1. **Last-known-good fallback** (`src/scrape.ts`). When a scraper fails,
+   `scrapeAll` fetches the build's own previously published JSON
+   (`https://stromdahl.github.io/lunchlund/lunchlund.json` — the *project*
+   Pages artifact this pipeline writes, **not** the short user-root mirror)
+   and reuses that restaurant's last menu instead of showing nothing. Guard:
+   the cached entry must carry a real menu fetched in the **same ISO week**
+   (a menu is weekly, so same-week data is still right; last week's is not).
+   Each entry carries `asOf` (the time it was actually fetched successfully);
+   on fallback the menu and its original `asOf` are preserved verbatim, so the
+   chain survives repeated failed builds without ever looking fresh, and the
+   week-boundary guard still fires. Rendered as a normal card plus a muted
+   "Kunde inte uppdatera idag — visar menyn från <date>" note (`.stale-note`,
+   `stale: true`). The cache fetch never throws: a missing/garbage/unreachable
+   cache → no fallback → the plain error card (the old behaviour). The pure
+   merge lives in `resolveRestaurant` (unit-tested in `tests/scrape.test.ts`).
+   This is the only layer that changes what a user sees on an *already-baked*
+   failed build — 2 and 3 only reduce how often a build fails.
+2. **Browser-ish request headers** (`src/scrapers/lib.ts`). Fetches send a
+   real-browser `user-agent` + `accept`/`accept-language` instead of the bare
+   `lunchlund/0.1` UA, on the theory that the nightly `415` is a WAF canned
+   response to a non-browser client (it's a GET with no body — not real
+   content negotiation). Plausible but unproven; a daytime success proves
+   nothing since daytime worked before too. Dial back if a host objects.
+3. **Retry with backoff** (`src/scrapers/lib.ts`, `fetchOk`). Network errors,
+   timeouts, and transient HTTP (`408/425/429/5xx`) are retried up to 3× with
+   a 400/800 ms backoff and a 15 s per-attempt timeout. `415` is intentionally
+   **not** retried — it won't change seconds later; headers are its lever.
+
 ## Failure modes & how to tell
 
 `scrapeAll` returns `{ fetchedAt, restaurants }` where each `Restaurant`
-that failed carries an `error` field. The renderer shows an inline
-"Kunde inte hämta menyn" card in place of the menu, and the CLI prints
-`<source>: FAILED — …` to stderr.
+that failed carries an `error` field. If a same-ISO-week menu was cached, the
+card still shows it (`stale: true`, plus the "kunde inte uppdatera" note);
+otherwise the renderer shows the inline "Kunde inte hämta menyn" card in place
+of the menu. Either way the CLI prints `<source>: FAILED — …` to stderr.
 
 Most likely things to break:
 - A site redesigns and drops the CSS classes the parser keys on.
@@ -135,10 +169,13 @@ Most likely things to break:
   Inspira, Aiko). Daytime runs from the same GitHub runners were fine,
   so it's host-side and time-correlated — but the cause (maintenance vs.
   bot mitigation) is unconfirmed. The cron is at 03:17 Stockholm to stay
-  clear; if error cards appear anyway, `gh workflow run build.yml`
-  during the day fixes the page (in-build retries won't outlast a
-  multi-hour window), and recurring 03:17 failures would point at
-  IP-based blocking instead.
+  clear; the last-known-good fallback now keeps a same-week menu on the page
+  through such a window instead of an error card, but a `gh workflow run
+  build.yml` during the day still gets *fresh* menus and repopulates the cache
+  (in-build retries alone won't outlast a multi-hour window). Recurring 03:17
+  failures would point at IP-based blocking instead. Note the fallback can
+  only show what the last *successful* build cached — if every build in a
+  week's run failed, there's nothing same-week to fall back to.
 
 ## Tests
 
