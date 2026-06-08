@@ -1,19 +1,11 @@
 import { ScrapeResult, Restaurant, DayMenu } from "./types";
 import { WEEKDAYS } from "./hours";
+import { isoWeek } from "./week";
 
 // HTML page lives on the project Pages site; feeds are mirrored to the
 // user-level Pages site so the canonical URLs are short.
 const PAGE_URL = "https://stromdahl.github.io/lunchlund";
 const FEED_BASE = "https://stromdahl.github.io";
-
-function isoWeek(d: Date): { year: number; week: number } {
-  // ISO 8601: the Thursday of the same week determines the year.
-  const t = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
-  t.setUTCDate(t.getUTCDate() + 4 - (t.getUTCDay() || 7));
-  const yearStart = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
-  const week = Math.ceil(((t.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
-  return { year: t.getUTCFullYear(), week };
-}
 
 function mondayOf(d: Date): Date {
   const m = new Date(d);

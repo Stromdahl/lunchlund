@@ -26,13 +26,26 @@ export type Restaurant = {
   price?: string;
   menu: DayMenu[];
   hours?: WeeklyHours;
+  /** ISO timestamp of the build that last fetched this menu *successfully*.
+   *  Set on every successful scrape; preserved verbatim when a failed build
+   *  falls back to this entry, so its age can be bounded across outages. */
+  asOf?: string;
+  /** True when this entry is last-known-good data shown because the fresh
+   *  scrape failed. The menu is real (just not re-fetched today); `error`
+   *  carries the latest failure reason. */
+  stale?: boolean;
   /** Set when the scraper for this restaurant failed. Identity (name/address/
-   *  website) still comes from the descriptor so the renderer can show a card. */
+   *  website) still comes from the descriptor so the renderer can show a card.
+   *  May coexist with a menu when `stale` is set (last-known-good fallback). */
   error?: { source: string; error: string };
 };
 
-/** What a scraper's parser produces — identity-free; the descriptor supplies it. */
-export type ScrapedData = Omit<Restaurant, "name" | "address" | "website" | "error">;
+/** What a scraper's parser produces — identity-free; the descriptor supplies
+ *  identity, and the build manages `asOf`/`stale`/`error`. */
+export type ScrapedData = Omit<
+  Restaurant,
+  "name" | "address" | "website" | "asOf" | "stale" | "error"
+>;
 
 export type ScraperDescriptor = {
   id: string;
