@@ -44,6 +44,18 @@ function stripScheme(url: string): string {
   return url.replace(/^https?:\/\//, "").replace(/\/$/, "");
 }
 
+// "tor 4 jun" — short Stockholm date for a stale entry's last-good fetch.
+function fmtAsOf(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  return new Intl.DateTimeFormat("sv-SE", {
+    timeZone: "Europe/Stockholm",
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+  }).format(d);
+}
+
 function hoursTodayLabel(
   hours: WeeklyHours | undefined,
   day: WeekdayKey,
@@ -162,6 +174,14 @@ function renderCard(r: Restaurant, todayKey: WeekdayKey): string {
     ? `<p class="wholeweek">Samma meny mån–fre.</p>`
     : "";
 
+  // Last-known-good: the fresh scrape failed, so we're showing the menu from
+  // the previous successful build. Say so, with the date it was fetched.
+  const staleBanner = r.stale
+    ? `<div class="stale-note"><span class="ico">↻</span><div>Kunde inte uppdatera idag${
+        r.asOf && fmtAsOf(r.asOf) ? ` — visar menyn från ${esc(fmtAsOf(r.asOf))}` : " — visar senast hämtade meny"
+      }.</div></div>`
+    : "";
+
   const itemsBlock = `<ul class="items">${todayLines.map(renderItem).join("")}</ul>`;
 
   // Whole-week and weekend cards aren't day-switchable, so no data-menu.
@@ -183,6 +203,7 @@ function renderCard(r: Restaurant, todayKey: WeekdayKey): string {
       <span class="pill ${initialPillCls}" data-state-pill><span class="dot"></span>${initialPillText}</span>
     </div>
     ${wholeWeekBanner}
+    ${staleBanner}
     ${itemsBlock}
   </li>`;
 }
@@ -277,6 +298,8 @@ a:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:3p
 .scrape-fail .ico{color:var(--bad);font-weight:800;line-height:1.3}
 .scrape-fail .errwhen{margin-top:4px;font-size:11.5px;color:var(--ink-3);letter-spacing:.04em}
 .scrape-fail a{font-weight:600}
+.stale-note{margin:8px 0 0;padding:7px 11px;background:var(--paper-2);border:1px solid var(--hair);border-radius:9px;font-size:12px;color:var(--ink-2);display:flex;align-items:flex-start;gap:8px;line-height:1.35}
+.stale-note .ico{color:var(--ink-3);font-weight:800;line-height:1.2}
 .card.is-error .name{color:var(--ink-2)}
 .foot{margin-top:36px;padding:22px 0 0;border-top:1px solid var(--hair);font-size:13px;color:var(--ink-2)}
 .foot .row{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
@@ -364,7 +387,10 @@ export function render(result: ScrapeResult): string {
 
   const cards = restaurants
     .map((r) =>
-      r.error
+      // Only a hard failure with nothing to show becomes an error card; a
+      // stale entry still has a real (last-known-good) menu, so it renders as
+      // a normal card with a "couldn't refresh" note.
+      r.error && r.menu.length === 0
         ? renderErrorCard(r, r.error, fetchedAt)
         : renderCard(r, todayKey),
     )
