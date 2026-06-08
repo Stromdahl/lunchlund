@@ -50,6 +50,15 @@ export function parseElementorLunch(
     if (lines.length) menu.push({ day, lines });
   }
 
+  // Throw rather than return an empty menu so a redesign or a bot-challenge
+  // interstitial (which loads with no .lunchmeny_container day blocks) surfaces
+  // as an error card / last-known-good fallback, not a silent empty card.
+  // Matches the kantin/aiko convention and the AGENTS.md "scrapers throw on
+  // primary-parse failure" rule.
+  if (menu.length === 0) {
+    throw new Error("elementor lunch: no day menus found");
+  }
+
   return { note, price, menu, hours: opts.hours };
 }
 
