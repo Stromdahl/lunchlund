@@ -4,12 +4,19 @@ on:
   push:
     branches: [main]
   schedule:
-    # 03:17 dodges a nightly window (~00:00–02:00 Stockholm) where the
-    # one.com-hosted sites returned 503 and the GlobalConnect-hosted ones
-    # 415 (Jun 3–5 2026); daytime runs from the same runners were fine.
-    # Cause unconfirmed — if failures recur at 03:17, suspect IP-based
-    # bot blocking rather than a time window.
+    # The hosts intermittently bot-block GitHub runner IPs (one.com → 503,
+    # GlobalConnect → 415 / content-less 200 challenge) in unpredictable
+    # windows — daytime too, not just ~00:00–02:00 Stockholm (observed
+    # 2026-06-08: a runner was blocked ~11:17 but fetched all 8 fine ~12:09).
+    # So we take two independent shots per weekday rather than trusting one
+    # window: 03:17 produces the morning page; 09:47 is a pre-lunch retry that
+    # also re-seeds the same-week last-known-good cache. A build that lands in
+    # a good window seeds the cache, and the fallback (src/scrape.ts) then
+    # carries each site through later bad-window builds. Add more slots if
+    # error cards still appear across a whole week.
     - cron: '17 3 * * 1-5'
+      timezone: "Europe/Stockholm"
+    - cron: '47 9 * * 1-5'
       timezone: "Europe/Stockholm"
   workflow_dispatch:
 
