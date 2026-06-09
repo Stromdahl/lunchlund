@@ -4,19 +4,22 @@ on:
   push:
     branches: [main]
   schedule:
-    # The hosts intermittently bot-block GitHub runner IPs (one.com → 503,
-    # GlobalConnect → 415 / content-less 200 challenge) in unpredictable
-    # windows — daytime too, not just ~00:00–02:00 Stockholm (observed
-    # 2026-06-08: a runner was blocked ~11:17 but fetched all 8 fine ~12:09).
-    # So we take two independent shots per weekday rather than trusting one
-    # window: 03:17 produces the morning page; 09:47 is a pre-lunch retry that
-    # also re-seeds the same-week last-known-good cache. A build that lands in
-    # a good window seeds the cache, and the fallback (src/scrape.ts) then
-    # carries each site through later bad-window builds. Add more slots if
-    # error cards still appear across a whole week.
+    # Two shots per weekday. The hosts intermittently bot-block GitHub runner
+    # IPs (one.com → 503, GlobalConnect → 415 / content-less 200 challenge) in
+    # unpredictable windows, so a build that lands in a good window seeds the
+    # same-week last-known-good cache and the fallback (src/scrape.ts) then
+    # carries each site through later bad-window builds.
+    #
+    # IMPORTANT: these cron times are NOT when the build runs. GitHub delays
+    # scheduled runs by ~3-4h under queue load (observed 2026-06-09: the 03:17
+    # slot fired 07:17 Stockholm = +240 min; the previous 09:47 slot fired
+    # 12:49 = +182 min, i.e. after lunch). So the crons are set ~4h before the
+    # wanted landing: 03:17 → ~07:17 (morning page); 06:17 → ~09:30–10:30
+    # (pre-lunch refresh + cache re-seed). Pull earlier / add slots if the
+    # drift grows or error cards persist across a whole week.
     - cron: '17 3 * * 1-5'
       timezone: "Europe/Stockholm"
-    - cron: '47 9 * * 1-5'
+    - cron: '17 6 * * 1-5'
       timezone: "Europe/Stockholm"
   workflow_dispatch:
 
