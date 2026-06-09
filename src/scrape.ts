@@ -1,4 +1,4 @@
-import { Restaurant, ScrapeResult, ScraperDescriptor } from "./types";
+import { Restaurant, ScrapedData, ScrapeResult, ScraperDescriptor } from "./types";
 import { SCRAPERS } from "./scrapers";
 import { sameIsoWeek } from "./week";
 
@@ -36,11 +36,16 @@ async function loadCache(): Promise<Map<string, Restaurant> | null> {
  *  builds without ever looking "fresh". Pure — no I/O. */
 export function resolveRestaurant(
   d: ScraperDescriptor,
-  outcome: PromiseSettledResult<Omit<Restaurant, "name" | "address" | "website" | "asOf" | "stale" | "error">>,
+  outcome: PromiseSettledResult<ScrapedData>,
   cache: Map<string, Restaurant> | null,
   now: Date,
 ): Restaurant {
-  const identity = { name: d.name, address: d.address, website: d.website };
+  const identity = {
+    name: d.name,
+    address: d.address,
+    website: d.website,
+    walkMinutes: d.walkMinutes,
+  };
 
   if (outcome.status === "fulfilled") {
     return { ...identity, ...outcome.value, asOf: now.toISOString() };

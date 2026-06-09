@@ -8,6 +8,7 @@ export const edison: ScraperDescriptor = {
   id: "edison",
   name: "Restaurang Edison",
   address: "Emdalavägen 6B, Lund",
+  walkMinutes: 11,
   website: URL,
   scrape: () =>
     scrapeElementorLunch(URL, "Restaurang Edison", {

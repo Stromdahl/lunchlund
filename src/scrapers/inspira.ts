@@ -8,6 +8,7 @@ export const inspira: ScraperDescriptor = {
   id: "inspira",
   name: "Restaurang & Café Inspira",
   address: "Scheelevägen 4, Lund",
+  walkMinutes: 14,
   website: URL,
   scrape: () =>
     scrapeElementorLunch(URL, "Restaurang & Café Inspira", {

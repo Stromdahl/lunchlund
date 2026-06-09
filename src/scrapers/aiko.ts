@@ -70,6 +70,7 @@ export const aiko: ScraperDescriptor = {
   id: "aiko",
   name: "Aiko Sushi Brunnshög",
   address: "Systemeraregatan 3, Lund",
+  walkMinutes: 6,
   website: URL,
   scrape: async () => parseAiko(await fetchText(URL, "aiko")),
 };

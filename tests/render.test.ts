@@ -20,6 +20,27 @@ test("render outputs an error card when a restaurant has an error", () => {
   assert.match(out, /boom/);
 });
 
+test("render links the address to a map and shows the walk time", () => {
+  const out = render({
+    fetchedAt: new Date("2026-06-09T08:00:00Z"),
+    restaurants: [
+      {
+        name: "Walk Place",
+        address: "Mobilvägen 12, Lund",
+        website: "https://walk.test/",
+        walkMinutes: 4,
+        menu: [{ day: "Hela veckan", lines: ["Sallad"] }],
+      },
+    ],
+  });
+  // address is an anchor to a Google Maps search for the url-encoded address
+  assert.match(
+    out,
+    /<a class="addr" href="[^"]*google\.com\/maps\/search[^"]*Mobilv%C3%A4gen%2012[^"]*"[^>]*>Mobilvägen 12, Lund<\/a>/,
+  );
+  assert.match(out, /class="walk"[^>]*>.*?ca 4 min<\/span>/s);
+});
+
 test("render shows a stale card with menu + note, not an error card", () => {
   const out = render({
     fetchedAt: new Date("2026-06-08T08:00:00Z"),

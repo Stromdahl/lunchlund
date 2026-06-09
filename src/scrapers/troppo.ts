@@ -75,6 +75,7 @@ export const troppo: ScraperDescriptor = {
   id: "troppo",
   name: "Troppo",
   address: "Brunnshögsgatan 34, Lund",
+  walkMinutes: 11,
   website: URL,
   scrape: async () => parseTroppo(await fetchText(URL, "troppo")),
 };
