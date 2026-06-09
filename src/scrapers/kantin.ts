@@ -89,6 +89,7 @@ export const kantin: ScraperDescriptor = {
   id: "kantin",
   name: "Kantin",
   address: "Brunnshögsgatan 14, Lund",
+  walkMinutes: 7,
   website: URL,
   scrape: async () => parseKantin(await fetchText(URL, "kantin")),
 };

@@ -44,6 +44,32 @@ function stripScheme(url: string): string {
   return url.replace(/^https?:\/\//, "").replace(/\/$/, "");
 }
 
+// Google Maps "search" URL — opens the address as a pin on any device, no
+// coordinates or API key needed. ", Sverige" disambiguates Lund from same-named
+// places abroad.
+function mapUrl(address: string): string {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    `${address}, Sverige`,
+  )}`;
+}
+
+// The address, linked to its map pin. Same-tab to match the webbplats/source
+// links elsewhere on the page.
+function addrLink(address: string): string {
+  return `<a class="addr" href="${esc(mapUrl(address))}" rel="noopener">${esc(address)}</a>`;
+}
+
+// Monochrome "directions walk" glyph (Material Icons path), inherits ink colour.
+const WALK_ICON = `<svg class="wico" viewBox="0 0 24 24" width="11" height="11" aria-hidden="true"><path fill="currentColor" d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9 7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6z"/></svg>`;
+
+// Estimated walking time from Mobilvägen 10. Guarded: cache-parsed entries may
+// predate the field, so show nothing rather than "undefined min".
+function walkLabel(r: Restaurant): string {
+  return r.walkMinutes != null
+    ? `<span class="walk" title="Uppskattad promenad från Mobilvägen 10">${WALK_ICON}ca ${r.walkMinutes} min</span>`
+    : "";
+}
+
 // "tor 4 jun" — short Stockholm date for a stale entry's last-good fetch.
 function fmtAsOf(iso: string): string {
   const d = new Date(iso);
@@ -193,7 +219,8 @@ function renderCard(r: Restaurant, todayKey: WeekdayKey): string {
       ${note}
     </div>
     <div class="meta">
-      <span>${esc(r.address)}</span>
+      ${addrLink(r.address)}
+      ${walkLabel(r)}
       ${price}
       ${web}
     </div>
@@ -228,7 +255,8 @@ function renderErrorCard(
       <h2 class="name">${esc(r.name)}</h2>
     </div>
     <div class="meta">
-      <span>${esc(r.address)}</span>
+      ${addrLink(r.address)}
+      ${walkLabel(r)}
       ${r.website ? `<a href="${esc(r.website)}" rel="noopener">webbplats ↗</a>` : ""}
     </div>
     <div class="when">
@@ -278,6 +306,8 @@ a:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:3p
 .meta{margin:4px 0 0;display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px;font-size:12.5px;color:var(--ink-2)}
 .meta .price{font-size:11.5px;font-weight:600;color:var(--ink);padding:1px 6px;border-radius:5px;background:var(--accent-soft);letter-spacing:-.005em}
 .meta a{font-weight:500}
+.meta .walk{display:inline-flex;align-items:center;gap:3px;color:var(--ink-3);white-space:nowrap}
+.meta .walk .wico{flex:none;opacity:.9;transform:translateY(.5px)}
 .when{margin:10px 0 4px;padding:3px 0 3px 9px;border-left:3px solid var(--accent);display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
 .when .day{color:var(--ink)}
 .when .sep{color:var(--ink-3);font-weight:600}

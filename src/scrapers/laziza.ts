@@ -49,6 +49,7 @@ export const laziza: ScraperDescriptor = {
   id: "laziza",
   name: "Laziza",
   address: "Scheelevägen 15K, Lund",
+  walkMinutes: 16,
   website: URL,
   scrape: async () => parseLaziza(await fetchText(URL, "laziza")),
 };

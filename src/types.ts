@@ -19,6 +19,10 @@ export type Restaurant = {
   name: string;
   address: string;
   website?: string;
+  /** Estimated walking minutes from Mobilvägen 10. Static identity supplied by
+   *  the descriptor (decided once, not scraped). Absent only on cache-parsed
+   *  entries, so the renderer guards on its presence. */
+  walkMinutes?: number;
   /** Free-form annotation shown under the name (e.g. "Lunchmeny V21"). */
   note?: string;
   /** Free-form lunch price as published by the site, e.g. "115:-",
@@ -44,7 +48,7 @@ export type Restaurant = {
  *  identity, and the build manages `asOf`/`stale`/`error`. */
 export type ScrapedData = Omit<
   Restaurant,
-  "name" | "address" | "website" | "asOf" | "stale" | "error"
+  "name" | "address" | "website" | "walkMinutes" | "asOf" | "stale" | "error"
 >;
 
 export type ScraperDescriptor = {
@@ -52,6 +56,8 @@ export type ScraperDescriptor = {
   name: string;
   address: string;
   website: string;
+  /** Estimated walking minutes from Mobilvägen 10 (static, hand-set per site). */
+  walkMinutes: number;
   scrape: () => Promise<ScrapedData>;
 };
 

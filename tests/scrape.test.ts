@@ -7,6 +7,7 @@ const desc: ScraperDescriptor = {
   id: "x",
   name: "Testaurang",
   address: "Mobilvägen 1",
+  walkMinutes: 5,
   website: "https://x.test/",
   scrape: async () => ({ menu: [] }),
 };

@@ -10,9 +10,14 @@ cron-run and published as a static page.
 ## Architecture
 
 Each scraper exports a **descriptor** (`ScraperDescriptor` in `src/types.ts`)
-that owns the restaurant's identity (id, name, address, website) and a
-`scrape()` function returning `ScrapedData` (the parsed pieces: note, price,
-menu, hours). `src/scrapers/index.ts` collects all descriptors into one
+that owns the restaurant's identity (id, name, address, `walkMinutes`, website)
+and a `scrape()` function returning `ScrapedData` (the parsed pieces: note,
+price, menu, hours). `walkMinutes` is a static estimate of the walk
+from Mobilvägen 10 (decided once, not scraped), measured on the OSM pedestrian
+network (geocode each address via Nominatim, route via the `routed-foot` OSRM
+profile, round `duration` to minutes). The renderer links each address to a
+Google Maps pin and shows the time next to it as "ca N min" — recompute if a
+restaurant moves. `src/scrapers/index.ts` collects all descriptors into one
 `SCRAPERS` array; `src/scrape.ts` runs them in parallel and merges identity
 + scraped data into the final `Restaurant[]`. A scraper failure attaches an
 `error: { source, error }` to the still-rendered card.

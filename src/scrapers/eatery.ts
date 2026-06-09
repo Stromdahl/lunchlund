@@ -25,6 +25,7 @@ export const eatery: ScraperDescriptor = {
   id: "eatery",
   name: "Eatery Lund",
   address: "Mobilvägen 4, Lund",
+  walkMinutes: 2,
   website: PAGE_URL,
   scrape: scrapeEatery,
 };
