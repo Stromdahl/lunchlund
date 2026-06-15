@@ -131,19 +131,25 @@ export function parseEateryMenu(text: string): {
 }
 
 // A day header stands alone on its own line. pdftotext occasionally renders it
-// with a dropped or stray letter — the V25 PDF printed "MÅDAG" for Monday,
+// with a dropped or substituted letter — the V25 PDF printed "MÅDAG" for Monday,
 // which the old exact-match gate skipped, silently swallowing that day's three
-// dishes. So accept a line whose compacted (space-stripped, upper-cased) form
-// is within one edit of a day token *and* of comparable length. Dish lines are
-// long sentences that stay several edits clear of every token, and the chrome
-// lines (LUNCH, MENY V25, LUND, STÄNGT, …) are all ≥2 edits away, so this won't
-// false-positive. Returns the matched canonical token, or undefined.
+// dishes. So accept a line whose compacted (space-stripped, upper-cased) form is
+// the token, the token with one letter changed, or the token with one letter
+// dropped (the observed failure modes). We deliberately do NOT accept the token
+// plus an extra trailing character ("MÅNDAG.", "ONSDAG1", "TISDAGX") — that
+// insertion case (flagged in #7) widens detection past the real pdftotext
+// glitches and could promote stray short lines to headers. Concretely: the
+// compacted form must be the token's length or exactly one shorter, never
+// longer. Dish lines are long sentences several edits clear of every token, and
+// the chrome lines (LUNCH, MENY V25, LUND, STÄNGT, …) are all ≥2 edits away, so
+// this won't false-positive. Returns the matched canonical token, or undefined.
 function matchDayToken(line: string): string | undefined {
   const compact = line.toUpperCase().replace(/\s+/g, "");
   if (!compact) return undefined;
-  return DAY_TOKENS.find(
-    (d) => Math.abs(compact.length - d.length) <= 1 && withinOneEdit(compact, d),
-  );
+  return DAY_TOKENS.find((d) => {
+    const drop = d.length - compact.length; // >0 means compact is the shorter
+    return drop >= 0 && drop <= 1 && withinOneEdit(compact, d);
+  });
 }
 
 // True when `a` and `b` differ by at most one insertion, deletion, or
