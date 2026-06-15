@@ -50,20 +50,61 @@ test("parseKantin suppresses extras for any 'stängt' wording", () => {
   assert.equal(monday!.lines.length, 3, "open day keeps its two extras");
 });
 
-// Documents the known gap in #8: a closed day worded WITHOUT the "stängt" stem
-// (e.g. "Helgdag") still gets the weekly extras prepended above it. Tripwire —
-// if the heuristic is broadened to catch such wordings, update this assertion.
-test("parseKantin still prepends extras to a closed day worded without 'stängt' (#8)", () => {
+// #8: closed days worded WITHOUT the "stängt" stem are now detected too, so
+// they stand alone instead of listing veg / månadens dishes above a closed
+// note. Covers the public-holiday labels (helgdag / röd dag) and the explicit
+// no-service wording ("ingen lunch") called out in the issue.
+test("parseKantin suppresses extras for non-'stängt' closed-day wordings (#8)", () => {
+  for (const note of ["Helgdag", "Röd dag", "ingen lunch"]) {
+    const html = `<html><body>
+      <h1>Meny 15/6 – 18/6</h1>
+      <p><strong>Veckans vegetariska</strong> Linsgryta</p>
+      <p><strong>Månadens alternativ</strong> Varmrökt lax</p>
+      <p><strong>Måndag</strong> Köttbullar</p>
+      <p><strong>Fredag</strong> – ${note}</p>
+    </body></html>`;
+    const { menu } = parseKantin(html);
+    const friday = menu.find((d) => d.day === "Fredag");
+    assert.deepEqual(friday!.lines, [note], `closed day "${note}" stands alone`);
+    const monday = menu.find((d) => d.day === "Måndag");
+    assert.equal(monday!.lines.length, 3, "open day still keeps its two extras");
+  }
+});
+
+// Boundary of the #8 broadening: a bare "Klämdag" is NOT treated as closed — a
+// bridge day can still serve lunch, so its extras are kept. A klämdag that is
+// actually closed says so via the other stems ("Klämdag – ingen lunch"), which
+// CLOSED_DAY does catch. Tripwire — revisit if a bare-klämdag closed day surfaces.
+test("parseKantin keeps extras on a bare 'klämdag' (may still serve)", () => {
   const html = `<html><body>
     <h1>Meny 15/6 – 18/6</h1>
     <p><strong>Veckans vegetariska</strong> Linsgryta</p>
     <p><strong>Månadens alternativ</strong> Varmrökt lax</p>
-    <p><strong>Fredag</strong> – Helgdag</p>
+    <p><strong>Fredag</strong> – Klämdag</p>
   </body></html>`;
   const { menu } = parseKantin(html);
   const friday = menu.find((d) => d.day === "Fredag");
-  assert.equal(friday!.lines.length, 3, "extras are (currently) prepended");
-  assert.equal(friday!.lines.at(-1), "Helgdag");
+  assert.equal(friday!.lines.length, 3, "bare klämdag keeps its two extras");
+  assert.equal(friday!.lines.at(-1), "Klämdag");
+});
+
+// The holiday stems are anchored with \b, so a real dish that merely starts
+// with them — "Röd dagsfärsk lax", or a "helgdagsöppet" (open on holidays) note
+// — is NOT read as closed and keeps its extras. Guards a future-menu false
+// positive the snapshots can't see (they depend on text we haven't scraped yet).
+test("parseKantin keeps extras when a holiday stem is only a word prefix", () => {
+  for (const dish of ["Röd dagsfärsk lax", "Helgdagsöppet som vanligt"]) {
+    const html = `<html><body>
+      <h1>Meny 15/6 – 18/6</h1>
+      <p><strong>Veckans vegetariska</strong> Linsgryta</p>
+      <p><strong>Månadens alternativ</strong> Varmrökt lax</p>
+      <p><strong>Fredag</strong> ${dish}</p>
+    </body></html>`;
+    const { menu } = parseKantin(html);
+    const friday = menu.find((d) => d.day === "Fredag");
+    assert.equal(friday!.lines.length, 3, `"${dish}" stays open, keeps extras`);
+    assert.equal(friday!.lines.at(-1), dish);
+  }
 });
 
 test("parseKantin throws when no day paragraphs are present", () => {
