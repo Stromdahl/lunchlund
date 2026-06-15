@@ -116,13 +116,8 @@ export function parseEateryMenu(text: string): {
 
   for (const line of lines) {
     if (!line) continue;
-    const upper = line.toUpperCase();
-    const dayToken = DAY_TOKENS.find(
-      (d) => upper === d || upper.startsWith(d + " ") || upper.endsWith(" " + d),
-    );
-    // The day appears centered on its own line — a strict equality match is
-    // safest; the loose checks above guard against stray spacing.
-    if (dayToken && upper.replace(/\s+/g, "") === dayToken) {
+    const dayToken = matchDayToken(line);
+    if (dayToken) {
       current = { day: DAY_DISPLAY[dayToken], lines: [] };
       menu.push(current);
       continue;
@@ -133,6 +128,55 @@ export function parseEateryMenu(text: string): {
   }
 
   return { menu, week };
+}
+
+// A day header stands alone on its own line. pdftotext occasionally renders it
+// with a dropped or stray letter — the V25 PDF printed "MÅDAG" for Monday,
+// which the old exact-match gate skipped, silently swallowing that day's three
+// dishes. So accept a line whose compacted (space-stripped, upper-cased) form
+// is within one edit of a day token *and* of comparable length. Dish lines are
+// long sentences that stay several edits clear of every token, and the chrome
+// lines (LUNCH, MENY V25, LUND, STÄNGT, …) are all ≥2 edits away, so this won't
+// false-positive. Returns the matched canonical token, or undefined.
+function matchDayToken(line: string): string | undefined {
+  const compact = line.toUpperCase().replace(/\s+/g, "");
+  if (!compact) return undefined;
+  return DAY_TOKENS.find(
+    (d) => Math.abs(compact.length - d.length) <= 1 && withinOneEdit(compact, d),
+  );
+}
+
+// True when `a` and `b` differ by at most one insertion, deletion, or
+// substitution (Levenshtein distance ≤ 1). Cheap, allocation-free.
+function withinOneEdit(a: string, b: string): boolean {
+  if (a === b) return true;
+  const la = a.length;
+  const lb = b.length;
+  if (Math.abs(la - lb) > 1) return false;
+  if (la === lb) {
+    let diff = 0;
+    for (let i = 0; i < la; i++) {
+      if (a[i] !== b[i] && ++diff > 1) return false;
+    }
+    return true;
+  }
+  // Lengths differ by one: walk both, allowing a single skip in the longer.
+  const short = la < lb ? a : b;
+  const long = la < lb ? b : a;
+  let i = 0;
+  let j = 0;
+  let skipped = false;
+  while (i < short.length && j < long.length) {
+    if (short[i] === long[j]) {
+      i++;
+      j++;
+    } else {
+      if (skipped) return false;
+      skipped = true;
+      j++;
+    }
+  }
+  return true;
 }
 
 function isBoilerplate(line: string): boolean {
