@@ -15,11 +15,14 @@ const WEEKLY_EXTRAS = ["Veckans vegetariska", "Månadens alternativ"];
 // the other unambiguous "no service" signals: a public-holiday label (röd dag /
 // helgdag) or an explicit "ingen lunch/servering/mat". A bare "klämdag" is left
 // out — a bridge day can still serve lunch, and any closed one says so via the
-// other stems (e.g. "Klämdag – ingen lunch"). The holiday labels carry a
-// trailing \b so a compound that merely starts with them — "röd dagsfärsk lax",
-// "helgdagsöppet" (the opposite, *open* on holidays) — doesn't read as closed.
+// other stems (e.g. "Klämdag – ingen lunch"). The holiday labels are followed by
+// a "not a letter" guard so a compound that merely starts with them — "röd
+// dagsfärsk lax", "helgdagsöppet" (the opposite, *open* on holidays) — doesn't
+// read as closed. We spell that guard out as (?![...]) rather than \b because
+// JS's \b counts only [A-Za-z0-9_] as word chars, so it would still fire before
+// a glued å/ä/ö ("helgdagöppet"); the class includes the Swedish vowels.
 const CLOSED_DAY =
-  /stängt|stängd|röd\s*dag\b|helgdag\b|ingen\s+(?:lunch|servering|mat)/i;
+  /stängt|stängd|röd\s*dag(?![\wåäöÅÄÖ])|helgdag(?![\wåäöÅÄÖ])|ingen\s+(?:lunch|servering|mat)/i;
 // Kantin: kitchen serves until 15:00 (building open till 16:00).
 const HOURS = weekdayLunch("11:00", "15:00");
 

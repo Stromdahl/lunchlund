@@ -88,12 +88,20 @@ test("parseKantin keeps extras on a bare 'klämdag' (may still serve)", () => {
   assert.equal(friday!.lines.at(-1), "Klämdag");
 });
 
-// The holiday stems are anchored with \b, so a real dish that merely starts
-// with them — "Röd dagsfärsk lax", or a "helgdagsöppet" (open on holidays) note
-// — is NOT read as closed and keeps its extras. Guards a future-menu false
-// positive the snapshots can't see (they depend on text we haven't scraped yet).
+// The holiday stems carry a "not a letter" guard, so a real dish that merely
+// starts with them — "Röd dagsfärsk lax", or a "helgdagsöppet" (open on
+// holidays) note — is NOT read as closed and keeps its extras. The glued-vowel
+// variants ("Helgdagöppet", "Röd dagöppet") are the case a plain \b would miss
+// (JS \b doesn't fire before å/ä/ö), so they pin the lookahead specifically.
+// Guards a future-menu false positive the snapshots can't see (they depend on
+// text we haven't scraped yet).
 test("parseKantin keeps extras when a holiday stem is only a word prefix", () => {
-  for (const dish of ["Röd dagsfärsk lax", "Helgdagsöppet som vanligt"]) {
+  for (const dish of [
+    "Röd dagsfärsk lax",
+    "Helgdagsöppet som vanligt",
+    "Helgdagöppet",
+    "Röd dagöppet som vanligt",
+  ]) {
     const html = `<html><body>
       <h1>Meny 15/6 – 18/6</h1>
       <p><strong>Veckans vegetariska</strong> Linsgryta</p>
