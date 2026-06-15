@@ -75,7 +75,13 @@ export function parseKantin(html: string): ScrapedData {
     const prefix = WEEKLY_EXTRAS
       .map((l) => extras.get(l))
       .filter((s): s is string => !!s);
-    for (const d of menu) d.lines = [...prefix, ...d.lines];
+    for (const d of menu) {
+      // A closed day (e.g. "fredag – Midsommarstängt" on a holiday week)
+      // serves none of the weekly extras, so let its line stand alone rather
+      // than listing veg / månadens dishes above a "stängt" note.
+      if (d.lines.some((l) => /stängt/i.test(l))) continue;
+      d.lines = [...prefix, ...d.lines];
+    }
   }
 
   if (menu.length === 0) {
