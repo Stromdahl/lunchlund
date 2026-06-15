@@ -8,6 +8,21 @@ const DAYS = WEEKDAYS.map((d) => d.sv);
 // Whole-week extras that run every weekday alongside the daily dish. Order
 // here is the order they're prepended on each day.
 const WEEKLY_EXTRAS = ["Veckans vegetariska", "Månadens alternativ"];
+// A closed day serves none of the weekly extras, so its line should stand alone
+// rather than listing veg / månadens dishes above a closed note. "stängt" is the
+// overwhelmingly common phrasing (Midsommarstängt, Helgstängt, Stängt pga …),
+// but #8 noted closed days worded without that stem slip through. So also match
+// the other unambiguous "no service" signals: a public-holiday label (röd dag /
+// helgdag) or an explicit "ingen lunch/servering/mat". A bare "klämdag" is left
+// out — a bridge day can still serve lunch, and any closed one says so via the
+// other stems (e.g. "Klämdag – ingen lunch"). The holiday labels are followed by
+// a "not a letter" guard so a compound that merely starts with them — "röd
+// dagsfärsk lax", "helgdagsöppet" (the opposite, *open* on holidays) — doesn't
+// read as closed. We spell that guard out as (?![...]) rather than \b because
+// JS's \b counts only [A-Za-z0-9_] as word chars, so it would still fire before
+// a glued å/ä/ö ("helgdagöppet"); the class includes the Swedish vowels.
+const CLOSED_DAY =
+  /stängt|stängd|röd\s*dag(?![\wåäöÅÄÖ])|helgdag(?![\wåäöÅÄÖ])|ingen\s+(?:lunch|servering|mat)/i;
 // Kantin: kitchen serves until 15:00 (building open till 16:00).
 const HOURS = weekdayLunch("11:00", "15:00");
 
@@ -76,10 +91,10 @@ export function parseKantin(html: string): ScrapedData {
       .map((l) => extras.get(l))
       .filter((s): s is string => !!s);
     for (const d of menu) {
-      // A closed day (e.g. "fredag – Midsommarstängt" on a holiday week)
-      // serves none of the weekly extras, so let its line stand alone rather
-      // than listing veg / månadens dishes above a "stängt" note.
-      if (d.lines.some((l) => /stängt/i.test(l))) continue;
+      // A closed day (e.g. "fredag – Midsommarstängt" on a holiday week) serves
+      // none of the weekly extras, so let its line stand alone rather than
+      // listing veg / månadens dishes above a closed note. See CLOSED_DAY.
+      if (d.lines.some((l) => CLOSED_DAY.test(l))) continue;
       d.lines = [...prefix, ...d.lines];
     }
   }
