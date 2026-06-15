@@ -27,3 +27,42 @@ test("parseEateryMenu recovers a typo'd day header (MÅDAG → Måndag)", () => 
   assert.equal(monday!.lines.length, 3);
   matchSnapshot("eatery-menu-typo", parseEateryMenu(text));
 });
+
+// Guard for the false-positive surface flagged in #7: the fuzzy day-matcher
+// must not promote chrome or other short lines to day headers. The closest
+// chrome line, "STÄNGT", is the same length as the 6-char tokens but ≥2 edits
+// away; "LUNCH"/"LUND"/"MENY V25"/"VECKAN" are out of range or ≥2 edits away.
+// If any of them matched, extra (garbage) day entries would appear here.
+test("parseEateryMenu does not treat chrome or short lines as day headers", () => {
+  const text = [
+    "LUNCH",
+    "LUND",
+    "MENY V25",
+    "VECKAN",
+    "MÅNDAG",
+    "Korvstroganoff med chorizo",
+    "STÄNGT",
+  ].join("\n");
+  const { menu } = parseEateryMenu(text);
+  assert.deepEqual(menu.map((d) => d.day), ["Måndag"]);
+  // "STÄNGT" after the header stays a dish line — it is not a second day.
+  assert.deepEqual(menu[0].lines, ["Korvstroganoff med chorizo", "STÄNGT"]);
+});
+
+// Companion to #7: pin the matcher's tolerance band. A single edit
+// (substitution / insertion / deletion) of a day word is recovered; anything
+// ≥2 edits stays content. The trailing-character case ("TISDAGX") documents
+// the widening noted in #7 — tighten this test if that behaviour changes.
+test("parseEateryMenu day detection recovers ≤1 edit, rejects ≥2", () => {
+  const sub = parseEateryMenu("ONSDAB\nStekt fläsk med löksås");
+  assert.deepEqual(sub.menu.map((d) => d.day), ["Onsdag"], "1 substitution");
+
+  const ins = parseEateryMenu("TISDAGX\nBuffalo chicken");
+  assert.deepEqual(ins.menu.map((d) => d.day), ["Tisdag"], "1 trailing insert");
+
+  // "VECKANS" is in the length band (7 chars) but ≥2 edits from every token,
+  // so it must NOT open a new day — it falls through as content.
+  const far = parseEateryMenu("MÅNDAG\nReal dish\nVECKANS\nstill monday");
+  assert.deepEqual(far.menu.map((d) => d.day), ["Måndag"], "≥2 edits → content");
+  assert.equal(far.menu[0].lines.length, 3);
+});
