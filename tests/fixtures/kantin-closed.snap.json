@@ -1,0 +1,77 @@
+{
+  "note": "Meny 15/6 – 18/6",
+  "menu": [
+    {
+      "day": "Måndag",
+      "lines": [
+        "Veckans vegetariska: Stracciatella – röda linser – bakad tomat – syrad lök – hjärtsallad – potatiskrisp",
+        "Månadens alternativ: Varmrökt lax – citronaioli – sallad – broccoli – bönor – rädisor – frökrisp – dill",
+        "Jerk Chicken – harissamajo – mangosalsa – dressad hjärtsallad – idahopotatis"
+      ]
+    },
+    {
+      "day": "Tisdag",
+      "lines": [
+        "Veckans vegetariska: Stracciatella – röda linser – bakad tomat – syrad lök – hjärtsallad – potatiskrisp",
+        "Månadens alternativ: Varmrökt lax – citronaioli – sallad – broccoli – bönor – rädisor – frökrisp – dill",
+        "Bräckt oxbringa – syrlig pepparrotssås – dillolja – fänkål – smörslungad färskpotatis"
+      ]
+    },
+    {
+      "day": "Onsdag",
+      "lines": [
+        "Veckans vegetariska: Stracciatella – röda linser – bakad tomat – syrad lök – hjärtsallad – potatiskrisp",
+        "Månadens alternativ: Varmrökt lax – citronaioli – sallad – broccoli – bönor – rädisor – frökrisp – dill",
+        "Smokey porkbelly – bbq-sås – cheddarstuvad majs – jalapeño – syrad kål – rostad potatis"
+      ]
+    },
+    {
+      "day": "Torsdag",
+      "lines": [
+        "Veckans vegetariska: Stracciatella – röda linser – bakad tomat – syrad lök – hjärtsallad – potatiskrisp",
+        "Månadens alternativ: Varmrökt lax – citronaioli – sallad – broccoli – bönor – rädisor – frökrisp – dill",
+        "Oxtartar – dillmajo – rostad blomkål – picklad morot – potatiskrisp – dill"
+      ]
+    },
+    {
+      "day": "Fredag",
+      "lines": [
+        "Midsommarstängt"
+      ]
+    }
+  ],
+  "hours": {
+    "mon": [
+      {
+        "open": "11:00",
+        "close": "15:00"
+      }
+    ],
+    "tue": [
+      {
+        "open": "11:00",
+        "close": "15:00"
+      }
+    ],
+    "wed": [
+      {
+        "open": "11:00",
+        "close": "15:00"
+      }
+    ],
+    "thu": [
+      {
+        "open": "11:00",
+        "close": "15:00"
+      }
+    ],
+    "fri": [
+      {
+        "open": "11:00",
+        "close": "15:00"
+      }
+    ],
+    "sat": [],
+    "sun": []
+  }
+}

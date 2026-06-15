@@ -1,0 +1,45 @@
+{
+  "menu": [
+    {
+      "day": "Måndag",
+      "lines": [
+        "Korvstroganoff med chorizo & falukorv, rostad paprika & rödlök, fänkål & örtsallad, basmatiris",
+        "Pepparrotsbakad kungsfisk, betor, kapris, dill & brynt smör, hyvlad morot & krämigt potatismos",
+        "Indisk dahl gryta med kokos, cashew, bakad blomkål med ingefära & chili, kryddigt basmatiris, mynta raita"
+      ]
+    },
+    {
+      "day": "Tisdag",
+      "lines": [
+        "Buffalo chicken, ostkräm med jalapeno, rostad potatis, coleslaw & picklad lök",
+        "Bakad sej med blomkålspuré, rostad spetskål, vittvinssås, kokt potatis med ört-&citronolja",
+        "Polenta med basilika och lagrad ost, zucchini & chilisallad, rostad kål, citron & vitlökskräm",
+        "Sweet Tuesday: Vi bjuder på något sött till kaffet!"
+      ]
+    },
+    {
+      "day": "Onsdag",
+      "lines": [
+        "Stekt fläsk med löksås, kokt nypotatis & rårörda lingon",
+        "Tandooribakad kummel med gurk & mynta raita, stjärnanis picklad pumpa & basmatiris med rostad kokos & koriander",
+        "Morot och halloumibiffar, rostad sötpotatis med spiskummin & lime, jalapenomajo & rostade pumpakärnor"
+      ]
+    },
+    {
+      "day": "Torsdag",
+      "lines": [
+        "Färsbiffar med medelhavssallad, salladsost med citron, chili, persilja, klyftpotatis, vitlökskräm",
+        "Fänkål och citronbakad kungsfisk med sandefjordsås & tångcaviar, & potatismos med brynt smör",
+        "Bakad rotselleri med rostade hasselnötter, brynt smör, ricotta med ramslök & citron, potatiskrisp",
+        "Pancake Thursday: Vi bjuder på pannkakor, lättvispad grädde och hemmagjord sylt!"
+      ]
+    },
+    {
+      "day": "Fredag",
+      "lines": [
+        "STÄNGT"
+      ]
+    }
+  ],
+  "week": "Lunchmeny V25"
+}
