@@ -49,16 +49,25 @@ test("parseEateryMenu does not treat chrome or short lines as day headers", () =
   assert.deepEqual(menu[0].lines, ["Korvstroganoff med chorizo", "STÄNGT"]);
 });
 
-// Companion to #7: pin the matcher's tolerance band. A single edit
-// (substitution / insertion / deletion) of a day word is recovered; anything
-// ≥2 edits stays content. The trailing-character case ("TISDAGX") documents
-// the widening noted in #7 — tighten this test if that behaviour changes.
-test("parseEateryMenu day detection recovers ≤1 edit, rejects ≥2", () => {
+// Companion to #7: pin the matcher's tolerance band. A day word with one letter
+// changed (substitution) or one letter dropped (deletion) is recovered — those
+// are the observed pdftotext glitches. A day word plus a trailing character
+// (insertion) is NOT a header: that widening was flagged in #7 and is now
+// rejected, so such a line is absorbed as content rather than opening a
+// spurious day. Anything ≥2 edits also stays content.
+test("parseEateryMenu day detection recovers substitution/drop, rejects insertion and ≥2 edits", () => {
   const sub = parseEateryMenu("ONSDAB\nStekt fläsk med löksås");
   assert.deepEqual(sub.menu.map((d) => d.day), ["Onsdag"], "1 substitution");
 
-  const ins = parseEateryMenu("TISDAGX\nBuffalo chicken");
-  assert.deepEqual(ins.menu.map((d) => d.day), ["Tisdag"], "1 trailing insert");
+  const drop = parseEateryMenu("MÅDAG\nKorvstroganoff med chorizo");
+  assert.deepEqual(drop.menu.map((d) => d.day), ["Måndag"], "1 dropped letter");
+
+  // Token + trailing char ("TISDAGX") must NOT open a day. Placed under a real
+  // header so we can assert it is absorbed as a content line, not silently
+  // dropped — proving "no spurious day", not merely "produced nothing".
+  const ins = parseEateryMenu("MÅNDAG\nReal dish\nTISDAGX\nmore food");
+  assert.deepEqual(ins.menu.map((d) => d.day), ["Måndag"], "trailing insert → content");
+  assert.deepEqual(ins.menu[0].lines, ["Real dish", "TISDAGX", "more food"]);
 
   // "VECKANS" is in the length band (7 chars) but ≥2 edits from every token,
   // so it must NOT open a new day — it falls through as content.
