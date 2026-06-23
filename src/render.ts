@@ -82,6 +82,14 @@ function fmtAsOf(iso: string): string {
   }).format(d);
 }
 
+// "YYYY-MM-DD" for an ISO timestamp in Stockholm time, or null if unparseable.
+// Used to tell whether a last-known-good entry was fetched earlier *today*.
+function ymdInStockholm(iso: string): string | null {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return null;
+  return fmtBuild(d).ymd;
+}
+
 function hoursTodayLabel(
   hours: WeeklyHours | undefined,
   day: WeekdayKey,
@@ -156,7 +164,7 @@ function renderDayBar(activeKey: WeekdayKey): string {
   return `<nav class="daybar" aria-label="Veckodag"><div class="daybar-inner" id="daybar">${btns}</div></nav>`;
 }
 
-function renderCard(r: Restaurant, todayKey: WeekdayKey): string {
+function renderCard(r: Restaurant, todayKey: WeekdayKey, buildYmd: string): string {
   const wholeWeek = isWholeWeekMenu(r);
   const isWeekend = todayKey === "sat" || todayKey === "sun";
   const todayName = daySv(todayKey);
@@ -201,8 +209,14 @@ function renderCard(r: Restaurant, todayKey: WeekdayKey): string {
     : "";
 
   // Last-known-good: the fresh scrape failed, so we're showing the menu from
-  // the previous successful build. Say so, with the date it was fetched.
-  const staleBanner = r.stale
+  // the previous successful build. Say so, with the date it was fetched — but
+  // suppress the banner entirely when that fetch was earlier *today*: the menu
+  // is genuinely current, so "Kunde inte uppdatera idag — visar menyn från
+  // [today]" would read as a self-contradiction. The banner still shows for a
+  // fallback from an earlier day, where the past date is meaningful.
+  const sameDayFallback =
+    r.asOf != null && ymdInStockholm(r.asOf) === buildYmd;
+  const staleBanner = r.stale && !sameDayFallback
     ? `<div class="stale-note"><span class="ico">↻</span><div>Kunde inte uppdatera idag${
         r.asOf && fmtAsOf(r.asOf) ? ` — visar menyn från ${esc(fmtAsOf(r.asOf))}` : " — visar senast hämtade meny"
       }.</div></div>`
@@ -422,7 +436,7 @@ export function render(result: ScrapeResult): string {
       // a normal card with a "couldn't refresh" note.
       r.error && r.menu.length === 0
         ? renderErrorCard(r, r.error, fetchedAt)
-        : renderCard(r, todayKey),
+        : renderCard(r, todayKey, built.ymd),
     )
     .join("\n");
 
