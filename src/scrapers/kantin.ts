@@ -1,7 +1,13 @@
 import * as cheerio from "cheerio";
 import { DayMenu, ScrapedData, ScraperDescriptor } from "../types";
 import { WEEKDAYS, weekdayLunch } from "../hours";
-import { cleanText, fetchText } from "./lib";
+import {
+  ClosurePeriod,
+  cleanText,
+  fetchText,
+  isClosedNow,
+  parseClosurePeriod,
+} from "./lib";
 
 const URL = "https://www.kantinlund.se/";
 const DAYS = WEEKDAYS.map((d) => d.sv);
@@ -106,11 +112,42 @@ export function parseKantin(html: string): ScrapedData {
   return { note, menu, hours: HOURS };
 }
 
+/** Find Kantin's whole-restaurant closure banner — a heading like
+ *  "Semesterstängt 26/6-9/8" sitting above the (reopening-week) menu — and
+ *  parse its window. Separate from parseKantin so the menu snapshot stays
+ *  date-independent; resolveKantin applies the window against today's date. */
+export function kantinClosure(html: string): ClosurePeriod | null {
+  const $ = cheerio.load(html);
+  let found: ClosurePeriod | null = null;
+  $("h1, h2").each((_, el) => {
+    const period = parseClosurePeriod(cleanText($(el).text()));
+    if (period) {
+      found = period;
+      return false;
+    }
+  });
+  return found;
+}
+
+/** Resolve Kantin against `now`: when the site announces a summer/holiday
+ *  closure covering today, return a closed entry (no menu, no hours) so the
+ *  card reads "Stängt idag" instead of the reopening-week menu Kantin keeps
+ *  published beneath the banner. Otherwise the normal parse. Pure — `now` is
+ *  injected so the menu-parse path stays testable and date-independent. */
+export function resolveKantin(html: string, now: Date): ScrapedData {
+  const closure = kantinClosure(html);
+  if (closure && isClosedNow(closure, now)) {
+    const until = `${closure.end.day}/${closure.end.month}`;
+    return { menu: [], closed: { note: `${closure.label} t.o.m. ${until}` } };
+  }
+  return parseKantin(html);
+}
+
 export const kantin: ScraperDescriptor = {
   id: "kantin",
   name: "Kantin",
   address: "Brunnshögsgatan 14, Lund",
   walkMinutes: 7,
   website: URL,
-  scrape: async () => parseKantin(await fetchText(URL, "kantin")),
+  scrape: async () => resolveKantin(await fetchText(URL, "kantin"), new Date()),
 };

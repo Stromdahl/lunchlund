@@ -1,7 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { parseKantin } from "../../src/scrapers/kantin";
+import { kantinClosure, parseKantin, resolveKantin } from "../../src/scrapers/kantin";
 import { matchSnapshot, readFixture } from "../fixtures/snapshot";
+
+const onDay = (iso: string) => new Date(`${iso}T12:00:00+02:00`);
 
 test("parseKantin matches snapshot", () => {
   const html = readFixture("kantin.html");
@@ -113,6 +115,34 @@ test("parseKantin keeps extras when a holiday stem is only a word prefix", () =>
     assert.equal(friday!.lines.length, 3, `"${dish}" stays open, keeps extras`);
     assert.equal(friday!.lines.at(-1), dish);
   }
+});
+
+// Summer-shutdown week: the page shows "Semesterstängt 26/6-9/8" above the
+// reopening-week menu ("Meny 10/8 – 14/8"). During the window the restaurant is
+// closed, so we must NOT present the August dishes as today's lunch. Regression
+// guard for the live page captured 2026-06-27 (issue: closed but a menu shown).
+test("resolveKantin reports closed during the summer window", () => {
+  const html = readFixture("kantin-summer.html");
+  const data = resolveKantin(html, onDay("2026-06-27"));
+  assert.deepEqual(data.menu, [], "no menu while closed");
+  assert.equal(data.hours, undefined, "no hours while closed → 'Stängt idag'");
+  assert.equal(data.closed?.note, "Semesterstängt t.o.m. 9/8");
+});
+
+// After the window closes, the very same page (banner text may linger) parses
+// normally: the August menu is now current, and there's no closed flag.
+test("resolveKantin shows the menu once the window has passed", () => {
+  const html = readFixture("kantin-summer.html");
+  const data = resolveKantin(html, onDay("2026-08-11"));
+  assert.equal(data.closed, undefined, "not closed after reopening");
+  assert.ok(data.menu.length > 0, "menu is shown");
+  const monday = data.menu.find((d) => d.day === "Måndag");
+  assert.ok(monday, "Monday present in the reopening-week menu");
+});
+
+// The closure banner is only read when present: a normal menu page has none.
+test("kantinClosure returns null on a normal menu page", () => {
+  assert.equal(kantinClosure(readFixture("kantin.html")), null);
 });
 
 test("parseKantin throws when no day paragraphs are present", () => {

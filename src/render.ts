@@ -222,6 +222,13 @@ function renderCard(r: Restaurant, todayKey: WeekdayKey, buildYmd: string): stri
       }.</div></div>`
     : "";
 
+  // Whole-restaurant closure (e.g. summer shutdown): the scraper emptied menu
+  // and hours, so the pill already reads "Stängt idag" — this banner says why
+  // and until when, in place of the (absent) menu.
+  const closedBanner = r.closed
+    ? `<div class="closed-note"><span class="ico">●</span><div>${esc(r.closed.note)}</div></div>`
+    : "";
+
   const itemsBlock = `<ul class="items">${todayLines.map(renderItem).join("")}</ul>`;
 
   // Whole-week and weekend cards aren't day-switchable, so no data-menu.
@@ -244,6 +251,7 @@ function renderCard(r: Restaurant, todayKey: WeekdayKey, buildYmd: string): stri
       <span class="pill ${initialPillCls}" data-state-pill><span class="dot"></span>${initialPillText}</span>
     </div>
     ${wholeWeekBanner}
+    ${closedBanner}
     ${staleBanner}
     ${itemsBlock}
   </li>`;
@@ -344,6 +352,8 @@ a:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:3p
 .scrape-fail a{font-weight:600}
 .stale-note{margin:8px 0 0;padding:7px 11px;background:var(--paper-2);border:1px solid var(--hair);border-radius:9px;font-size:12px;color:var(--ink-2);display:flex;align-items:flex-start;gap:8px;line-height:1.35}
 .stale-note .ico{color:var(--ink-3);font-weight:800;line-height:1.2}
+.closed-note{margin:8px 0 0;padding:9px 12px;background:var(--paper-2);border:1px solid var(--rule);border-radius:9px;font-size:13px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:8px;line-height:1.35}
+.closed-note .ico{color:var(--bad);font-size:9px;line-height:1}
 .card.is-error .name{color:var(--ink-2)}
 .foot{margin-top:36px;padding:22px 0 0;border-top:1px solid var(--hair);font-size:13px;color:var(--ink-2)}
 .foot .row{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
