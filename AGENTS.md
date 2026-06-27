@@ -101,6 +101,29 @@ day's lines:
 Throws `kantin: no day paragraphs found` if nothing parses, so a layout
 change shows as an error card instead of an empty menu.
 
+**Summer/holiday closure.** During a shutdown Kantin keeps the *reopening*
+week's menu published, under a heading banner like
+`Semesterstängt 26/6-9/8` — so a naive parse shows dishes the kitchen isn't
+serving (the bug from 2026-06-27). `kantinClosure` reads that banner and
+`resolveKantin(html, now)` returns a closed entry (empty `menu`, no `hours`,
+a `closed: { note }`) when today falls in the window, so the card reads
+"Stängt idag" instead. The window parser (`parseClosurePeriod`) and
+"is today inside it?" check (`isClosedNow`) are **shared helpers in
+`scrapers/lib.ts`** — wire them into other scrapers as those sites post their
+own summer banners (none did as of 2026-06-27). Closures compare by
+(month, day) so the window auto-expires once today passes `end`, even if the
+banner text lingers after reopening. Note: `closed` does not survive the
+last-known-good fallback (empty `menu` fails its `prev.menu?.length` guard),
+so a *failed* build mid-closure falls back to an error card — transient,
+self-heals on the next successful build.
+
+Tripwire for the case this does NOT catch — a restaurant that closes
+*silently*, just leaving last week's menu up with no banner. The menu's
+week heading (Kantin's `note`, the elementor sites' "Lunchmeny V21", Eatery's
+`Lund_sv_V<week>.pdf`) is the signal there: a declared week that isn't the
+current ISO week. Not built — restaurants legitimately post next week's menu
+late in the current week, so a hard week-mismatch block would hide it.
+
 ### Troppo — `https://www.troppo.se/lunch`
 
 Webflow site with one weekly menu of 3 dishes available all weekdays. The

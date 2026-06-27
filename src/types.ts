@@ -30,6 +30,12 @@ export type Restaurant = {
   price?: string;
   menu: DayMenu[];
   hours?: WeeklyHours;
+  /** Set when the restaurant is wholly closed today (e.g. a summer/holiday
+   *  shutdown announced on the site). The scraper empties `menu` and `hours`
+   *  so the card reads "Stängt idag" rather than showing a menu the kitchen
+   *  isn't serving; `note` is the human-readable closure line, e.g.
+   *  "Semesterstängt t.o.m. 9/8". */
+  closed?: { note: string };
   /** ISO timestamp of the build that last fetched this menu *successfully*.
    *  Set on every successful scrape; preserved verbatim when a failed build
    *  falls back to this entry, so its age can be bounded across outages. */

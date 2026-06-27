@@ -79,3 +79,18 @@ export function stockholmDayAndTime(d: Date): {
 export function formatInterval(i: OpeningInterval): string {
   return `${i.open}–${i.close}`;
 }
+
+/** Extract month (1–12) and day-of-month in Europe/Stockholm from a Date.
+ *  Used by the closure window check so "is today inside the window?" is judged
+ *  on the same calendar day a visitor in Lund sees, not UTC. */
+export function stockholmMonthDay(d: Date): { month: number; day: number } {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/Stockholm",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(d);
+  const g = (t: string) =>
+    Number((parts.find((p) => p.type === t) as Intl.DateTimeFormatPart).value);
+  return { month: g("month"), day: g("day") };
+}
