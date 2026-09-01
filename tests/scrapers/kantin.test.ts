@@ -186,3 +186,19 @@ test("parseKantin does not read a day-prefixed compound as a day label", () => {
   assert.deepEqual(menu.map((d) => d.day), ["Måndag"]);
   assert.deepEqual(menu[0].lines, ["Köttbullar"]);
 });
+
+// "Månadens alternativ" and "Måndag" share the five-character prefix "Månad";
+// they diverge only at position 5 (a vs g). Since the day matcher runs first
+// and now tolerates a label glued to what follows, pin that the extras heading
+// isn't claimed as Monday — a one-character margin is too thin to leave
+// unguarded.
+test("parseKantin does not read 'Månadens alternativ' as Måndag", () => {
+  const html = `<html><body>
+    <h1>Meny 31/8 – 4/9</h1>
+    <p><strong>Månadens alternativ:<br /></strong>Räkor</p>
+    <p><strong>Måndag<br /></strong>Köttbullar</p>
+  </body></html>`;
+  const { menu } = parseKantin(html);
+  assert.deepEqual(menu.map((d) => d.day), ["Måndag"]);
+  assert.deepEqual(menu[0].lines, ["Månadens alternativ: Räkor", "Köttbullar"]);
+});
