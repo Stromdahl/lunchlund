@@ -352,6 +352,9 @@ a:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:3p
 .scrape-fail a{font-weight:600}
 .stale-note{margin:8px 0 0;padding:7px 11px;background:var(--paper-2);border:1px solid var(--hair);border-radius:9px;font-size:12px;color:var(--ink-2);display:flex;align-items:flex-start;gap:8px;line-height:1.35}
 .stale-note .ico{color:var(--ink-3);font-weight:800;line-height:1.2}
+.page-stale{margin:14px 0 0;padding:10px 13px;background:var(--bad-soft);border:1px solid var(--hair);border-radius:10px;font-size:13px;color:var(--ink-2);display:flex;align-items:flex-start;gap:9px;line-height:1.4}
+.page-stale .ico{color:var(--bad);font-weight:800;line-height:1.25}
+.page-stale strong{color:var(--ink)}
 .closed-note{margin:8px 0 0;padding:9px 12px;background:var(--paper-2);border:1px solid var(--rule);border-radius:9px;font-size:13px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:8px;line-height:1.35}
 .closed-note .ico{color:var(--bad);font-size:9px;line-height:1}
 .card.is-error .name{color:var(--ink-2)}
@@ -362,9 +365,10 @@ a:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:3p
 .foot a{color:var(--ink)}
 .foot .colophon{margin-top:18px;font-size:12px;color:var(--ink-3);font-style:italic}`;
 
-function inlineScript(buildDayKey: WeekdayKey): string {
+function inlineScript(buildDayKey: WeekdayKey, buildYmd: string): string {
   return `(function(){
 const BUILD_DAY=${JSON.stringify(buildDayKey)};
+const BUILD_YMD=${JSON.stringify(buildYmd)};
 const DAY_NAMES={mon:'Måndag',tue:'Tisdag',wed:'Onsdag',thu:'Torsdag',fri:'Fredag',sat:'Lördag',sun:'Söndag'};
 const VIEW_DAYS=['mon','tue','wed','thu','fri'];
 function nowSthlm(){
@@ -430,6 +434,49 @@ document.querySelectorAll('.daybtn').forEach(b=>{
   b.addEventListener('click',function(){applyDay(b.dataset.day)});
 });
 if(VIEW_DAYS.indexOf(t.day)!==-1)applyDay(t.day);
+// Staleness banner. A build can't know it will later go stale — the page has
+// to work this out at view time — so it's injected here rather than rendered
+// server-side, and a JS-off reader simply doesn't see it. The test is *how
+// many weekdays* have passed since the build, not whether the date differs:
+// Friday's build is the correct content all weekend, and a banner that cried
+// stale every Saturday would be ignored by the Monday it finally mattered.
+// Zero weekdays in between → silent. This is the signal that was missing when
+// GitHub disabled the scheduled workflow for inactivity on 2026-08-27 and the
+// page served week-35 menus, unremarked, into September.
+function sthlmYmd(d){
+  const p=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Stockholm',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d);
+  const g=x=>p.find(y=>y.type===x).value;
+  return g('year')+'-'+g('month')+'-'+g('day');
+}
+// Noon UTC, not midnight: rendering a midnight anchor back in Europe/Stockholm
+// would shift it to the previous day. Both ends share the anchor, so the
+// day-stepping below is unaffected by DST.
+function ymdAnchor(s){const p=s.split('-').map(Number);return Date.UTC(p[0],p[1]-1,p[2],12)}
+function weekdaysBetween(a,b){
+  let n=0;
+  // Capped so a wildly wrong clock or build stamp can't spin the loop.
+  for(let t=a+86400000,i=0;t<b&&i<400;t+=86400000,i++){
+    const w=new Date(t).getUTCDay();
+    if(w>=1&&w<=5)n++;
+  }
+  return n;
+}
+(function(){
+  const build=ymdAnchor(BUILD_YMD);
+  const today=ymdAnchor(sthlmYmd(new Date()));
+  if(!(today>build))return;
+  const missed=weekdaysBetween(build,today);
+  if(missed<1)return;
+  const when=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Stockholm',weekday:'long',day:'numeric',month:'long'}).format(new Date(build));
+  const el=document.createElement('div');
+  el.className='page-stale';
+  el.setAttribute('role','status');
+  el.innerHTML='<span class="ico">!</span><div><strong>Sidan är inte uppdaterad.</strong> '+
+    'Senaste hämtningen gjordes '+esc(when)+', '+missed+(missed===1?' vardag':' vardagar')+
+    ' sedan. Menyerna nedan kan vara inaktuella \u2014 kolla källorna längst ner.</div>';
+  const header=document.querySelector('header.top');
+  if(header)header.appendChild(el);
+})();
 })();`;
 }
 
@@ -498,7 +545,7 @@ ${sourceLinks}
 <div class="colophon">Lunchlund · uppdateras varje vardagsmorgon · Europe/Stockholm</div>
 </footer>
 </div>
-<script>${inlineScript(todayKey)}</script>
+<script>${inlineScript(todayKey, built.ymd)}</script>
 </body>
 </html>
 `;
