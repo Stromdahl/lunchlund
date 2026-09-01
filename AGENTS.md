@@ -59,7 +59,14 @@ The landing page only links out; the menu lives in a PDF at
 scraper:
 
 1. Fetches the landing page; `parseEateryLanding` picks the first
-   `Lund_sv_V*.pdf` href and the early-bird/ordinarie prices.
+   `Lund_sv_V*.pdf` href and the early-bird/ordinarie prices. The filename
+   pattern tolerates a suffix between the week number and the extension
+   (`Lund_sv_V35-2.pdf`, a re-upload) and, when no anchor matches, sweeps the
+   raw HTML — Elementor keeps a second copy of the href inside its escaped
+   `data-settings` JSON. It deliberately does **not** fall back to
+   `Lund_eng_V*.pdf`: `parseEateryMenu` keys on uppercase *Swedish* day tokens,
+   so the English PDF would parse to an empty menu, which reads worse than an
+   honest error card.
 2. Downloads the PDF.
 3. Shells out to `pdftotext -layout - -` (poppler-utils) for text.
 4. `parseEateryMenu` walks the text line-by-line; uppercase Swedish day
@@ -84,11 +91,20 @@ hours line and the contact line's `<b>info@…</b>` email):
   — the strong is buried in nested `oneComWebmail-*` `<span>`s, the day name
   is lowercased, and an en-dash separates the dish. (This layout broke the
   2026-06-01 cron run.)
+- Bold closed by a line break: `<strong>Måndag<br /></strong>dish…`. cheerio's
+  `.text()` drops the `<br>`, so the paragraph reads `MåndagKalv tri-tip` with
+  **no separator at all**. (This broke the 2026-09-01 build — every day
+  paragraph was skipped and the scraper threw "no day paragraphs found".)
 
-The day-label strip consumes any trailing run of whitespace, colon, or
-hyphen/dash variant before the dish. Both shapes — plus `<b>` labels and a
-colon separator — have fixture-backed snapshots (`kantin.html`,
-`kantin-webmail.html`).
+`matchLabel`/`stripLabel` handle all three: a label matches when it leads the
+paragraph and the next character is not a lowercase letter (so the glued form
+is accepted but a compound like "Fredagsmys" is not), and the strip consumes
+any following run of whitespace, colon, or hyphen/dash variant. The guard is a
+character test rather than a regex lookahead because the `/i` flag would make a
+lowercase class match uppercase too — rejecting the very `MåndagKalv` shape it
+exists to catch. All three shapes — plus `<b>` labels and a colon separator —
+have fixture-backed snapshots (`kantin.html`, `kantin-webmail.html`,
+`kantin-br.html`).
 
 Two whole-week extras share the paragraph shape and are prepended to every
 day's lines:
@@ -204,6 +220,23 @@ Most likely things to break:
   failures would point at IP-based blocking instead. Note the fallback can
   only show what the last *successful* build cached — if every build in a
   week's run failed, there's nothing same-week to fall back to.
+- **The scheduled build stops running at all.** GitHub disables a workflow's
+  `schedule:` triggers after 60 days without repo activity. That happened on
+  2026-08-27 (last commit 2026-06-27) and the page silently served week-35
+  menus into September — no error cards, nothing wrong-looking, just old food.
+  This repo goes months between commits, so it will recur. `gh workflow list
+  --all` shows the state (`disabled_inactivity`); `gh workflow enable
+  "Build and deploy"` turns it back on. **Check this before debugging a
+  scraper** whenever the page looks stale.
+
+  The page now says so itself: the inline script counts the weekdays between
+  the build date and today (Europe/Stockholm) and injects a `.page-stale`
+  banner into the header when that count is ≥ 1. It's deliberately *not* a
+  plain date comparison — Friday's build is correct content all weekend, and a
+  banner that cried stale every Saturday would be ignored by the Monday it
+  finally mattered. Being client-side, it's invisible with JS off; the
+  `render.test.ts` stale-banner tests run the real inline script against a DOM
+  stub with the clock pinned.
 
 ## Tests
 
