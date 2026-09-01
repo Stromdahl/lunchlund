@@ -32,6 +32,33 @@ const CLOSED_DAY =
 // Kantin: kitchen serves until 15:00 (building open till 16:00).
 const HOURS = weekdayLunch("11:00", "15:00");
 
+// A label (a day name, or a weekly-extra heading) and the dish that follows it
+// are separated by whitespace, a colon, or a dash — or, since Kantin started
+// closing the bold with a <br> ("<strong>Måndag<br /></strong>Kalv tri-tip"), by
+// nothing at all: cheerio's .text() drops the <br>, so the paragraph reads
+// "MåndagKalv tri-tip" with no separator left to match on. That glue is what
+// broke the 2026-09-01 build (every day paragraph silently skipped → "no day
+// paragraphs found"). So accept the glued form, but only when the next
+// character isn't a lowercase letter — that keeps a compound word
+// ("Fredagsmys", "Torsdagsklassiker") from reading as a day label. The guard is
+// an explicit character test rather than a lookahead in the pattern because the
+// /i flag would make a lowercase class match uppercase too, rejecting the very
+// "MåndagKalv" shape it exists to catch.
+const SEPARATOR = /^[-:\s\u2010-\u2015\u2212]+/;
+
+/** The first of `labels` that leads `full`, or undefined. */
+function matchLabel(full: string, labels: string[]): string | undefined {
+  return labels.find((lbl) => {
+    if (!new RegExp(`^${lbl}`, "i").test(full)) return false;
+    return !/[a-zåäö]/.test(full.charAt(lbl.length));
+  });
+}
+
+/** `full` with its leading `label` and any following separator removed. */
+function stripLabel(full: string, label: string): string {
+  return full.slice(label.length).replace(SEPARATOR, "").trim();
+}
+
 export function parseKantin(html: string): ScrapedData {
   const $ = cheerio.load(html);
 
@@ -71,25 +98,17 @@ export function parseKantin(html: string): ScrapedData {
     const lead = cleanText(bold.text());
     if (!lead || !full.startsWith(lead)) return;
 
-    const day = DAYS.find((d) =>
-      new RegExp(`^${d}\\b`, "i").test(full),
-    );
+    const day = matchLabel(full, DAYS);
     if (day) {
-      // Strip the day label and any following separator: whitespace, colon, or
-      // any hyphen/dash variant (ASCII -, U+2010–2015, minus sign U+2212).
-      const rest = full
-        .replace(new RegExp(`^${day}[\\s:\\u2010-\\u2015\\u2212-]+`, "i"), "")
-        .trim();
+      const rest = stripLabel(full, day);
       if (rest) menu.push({ day, lines: [rest] });
       return;
     }
 
-    for (const lbl of WEEKLY_EXTRAS) {
-      const m = full.match(new RegExp(`^${lbl}\\s+(.+)$`, "i"));
-      if (m) {
-        extras.set(lbl, `${lbl}: ${m[1].trim()}`);
-        break;
-      }
+    const extraLbl = matchLabel(full, WEEKLY_EXTRAS);
+    if (extraLbl) {
+      const rest = stripLabel(full, extraLbl);
+      if (rest) extras.set(extraLbl, `${extraLbl}: ${rest}`);
     }
   });
   if (extras.size) {

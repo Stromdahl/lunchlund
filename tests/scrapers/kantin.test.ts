@@ -151,3 +151,38 @@ test("parseKantin throws when no day paragraphs are present", () => {
     /kantin: no day paragraphs found/,
   );
 });
+
+// Kantin's editor started closing the bold day label with a <br> instead of a
+// trailing space ("<strong>Måndag<br /></strong>Kalv tri-tip"), which glues the
+// label to the dish in the paragraph's text and defeated the old `^Måndag\b`
+// match — every day paragraph was skipped and the scraper threw "no day
+// paragraphs found". Regression guard for the live page captured 2026-09-01.
+test("parseKantin matches snapshot (day label glued to dish by <br>)", () => {
+  const html = readFixture("kantin-br.html");
+  const data = parseKantin(html);
+  assert.equal(data.note, "Meny 31/8 – 4/9");
+  assert.deepEqual(
+    data.menu.map((d) => d.day),
+    ["Måndag", "Tisdag", "Onsdag", "Torsdag", "Fredag"],
+  );
+  // The colon-and-<br> extras heading ("Veckans vegetariska:<br>") is picked up
+  // and prepended to every open day.
+  assert.ok(
+    data.menu[0].lines[0].startsWith("Veckans vegetariska: Rostad spetskål"),
+    "weekly veg extra leads each day",
+  );
+  matchSnapshot("kantin-br", data);
+});
+
+// The glue tolerance must not swallow a compound word that merely starts with a
+// day name — "Fredagsmys" is a dish heading, not Friday's label.
+test("parseKantin does not read a day-prefixed compound as a day label", () => {
+  const html = `<html><body>
+    <h1>Meny 31/8 – 4/9</h1>
+    <p><strong>Fredagsmys</strong> Tacobuffé</p>
+    <p><strong>Måndag<br /></strong>Köttbullar</p>
+  </body></html>`;
+  const { menu } = parseKantin(html);
+  assert.deepEqual(menu.map((d) => d.day), ["Måndag"]);
+  assert.deepEqual(menu[0].lines, ["Köttbullar"]);
+});

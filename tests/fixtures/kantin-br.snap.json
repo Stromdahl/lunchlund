@@ -1,0 +1,79 @@
+{
+  "note": "Meny 31/8 – 4/9",
+  "menu": [
+    {
+      "day": "Måndag",
+      "lines": [
+        "Veckans vegetariska: Rostad spetskål – gochujang smörsås – sojabönor – cashewnötter – frissé – potatis – rostade frön",
+        "Månadens alternativ: Räkor – dillaioli – romansallad – haricot verts – blomkål – frökrisp – dill",
+        "Kalv tri-tip – bakad tomat – potatis & vitlöksstomp – borettanalök – sky – rostad lök – ört"
+      ]
+    },
+    {
+      "day": "Tisdag",
+      "lines": [
+        "Veckans vegetariska: Rostad spetskål – gochujang smörsås – sojabönor – cashewnötter – frissé – potatis – rostade frön",
+        "Månadens alternativ: Räkor – dillaioli – romansallad – haricot verts – blomkål – frökrisp – dill",
+        "Nattbakad fläsksida – dillpickles hot sauce – blomkål – kål & äppleslaw – frön – potatis"
+      ]
+    },
+    {
+      "day": "Onsdag",
+      "lines": [
+        "Veckans vegetariska: Rostad spetskål – gochujang smörsås – sojabönor – cashewnötter – frissé – potatis – rostade frön",
+        "Månadens alternativ: Räkor – dillaioli – romansallad – haricot verts – blomkål – frökrisp – dill",
+        "Kycklingsteak – chilimayo – tomat & bönsalsa – paksoi – sky- potatis"
+      ]
+    },
+    {
+      "day": "Torsdag",
+      "lines": [
+        "Veckans vegetariska: Rostad spetskål – gochujang smörsås – sojabönor – cashewnötter – frissé – potatis – rostade frön",
+        "Månadens alternativ: Räkor – dillaioli – romansallad – haricot verts – blomkål – frökrisp – dill",
+        "Råbiffstorsdag – Oxtartar – tryffelaioli – rostad broccoli – picklad lök – parmesan – frön – krasse"
+      ]
+    },
+    {
+      "day": "Fredag",
+      "lines": [
+        "Veckans vegetariska: Rostad spetskål – gochujang smörsås – sojabönor – cashewnötter – frissé – potatis – rostade frön",
+        "Månadens alternativ: Räkor – dillaioli – romansallad – haricot verts – blomkål – frökrisp – dill",
+        "Nattbakad oxkind – dragonmajo – rostad morot – pickles – chilisky – potatis – ört"
+      ]
+    }
+  ],
+  "hours": {
+    "mon": [
+      {
+        "open": "11:00",
+        "close": "15:00"
+      }
+    ],
+    "tue": [
+      {
+        "open": "11:00",
+        "close": "15:00"
+      }
+    ],
+    "wed": [
+      {
+        "open": "11:00",
+        "close": "15:00"
+      }
+    ],
+    "thu": [
+      {
+        "open": "11:00",
+        "close": "15:00"
+      }
+    ],
+    "fri": [
+      {
+        "open": "11:00",
+        "close": "15:00"
+      }
+    ],
+    "sat": [],
+    "sun": []
+  }
+}
