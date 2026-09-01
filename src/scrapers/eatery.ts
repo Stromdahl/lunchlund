@@ -36,15 +36,22 @@ export function parseEateryLanding(html: string): {
 } {
   const $ = cheerio.load(html);
 
-  // Pick the first link to a Lund_sv_V*.pdf — the Swedish weekly menu.
-  let pdfUrl: string | undefined;
-  $("a[href]").each((_, a) => {
-    const href = $(a).attr("href") || "";
-    if (/Lund_sv_V\d+\.pdf/i.test(href)) {
-      pdfUrl = href;
-      return false;
-    }
-  });
+  // Pick the first link to the Swedish weekly menu PDF. The canonical name is
+  // "Lund_sv_V36.pdf", but the pattern is deliberately loose about what sits
+  // between the week number and the extension: a re-upload arrives as
+  // "Lund_sv_V35-2.pdf" or "Lund_sv_V35 (1).pdf", and an anchor requiring
+  // ".pdf" immediately after the digits blanks the whole card for that week.
+  // We do NOT fall back to the English "Lund_eng_V*.pdf" — parseEateryMenu
+  // matches uppercase *Swedish* day tokens, so the English PDF would parse to
+  // an empty menu, which reads worse than an honest error card.
+  let pdfUrl = $("a[href]")
+    .map((_, a) => $(a).attr("href") || "")
+    .get()
+    .find((href) => MENU_PDF_RE.test(href));
+  // Elementor also keeps a copy of the button's href inside its settings JSON
+  // (the `data-settings` blob), and a template change can leave the URL only
+  // there, with no real anchor to find. Sweep the raw HTML before giving up.
+  if (!pdfUrl) pdfUrl = html.match(RAW_MENU_PDF_RE)?.[0];
   if (!pdfUrl) throw new Error("eatery: no Lund_sv_V*.pdf link found on page");
 
   // The lunch section lists two prices in adjacent <p>'s:
@@ -74,6 +81,18 @@ export function parseEateryLanding(html: string): {
 
   return { pdfUrl, price };
 }
+
+// "…/Lund_sv_V36.pdf", "…/Lund_sv_V35-2.pdf", "…/Lund_sv_V35%20(1).pdf". The
+// separators around "sv" tolerate a hyphen as well as the usual underscore.
+const MENU_PDF_RE = /Lund[_-]sv[_-]V\d+[^/?#"'\s]*\.pdf/i;
+
+// Same filename, but matched against raw HTML rather than a parsed attribute,
+// so it has to carve its own URL boundaries. `&` is excluded because inside an
+// escaped `data-settings` blob the URLs are separated by `&quot;` — allowing it
+// would let the match run backwards into the previous JSON key. The match stops
+// at ".pdf", dropping the "?v=" cache-buster: the query isn't needed to fetch.
+const RAW_MENU_PDF_RE =
+  /https?:\/\/[^\s"'<>\\&]*Lund[_-]sv[_-]V\d+[^/\s"'<>\\&?#]*\.pdf/i;
 
 function pdfToText(pdf: Buffer): Promise<string> {
   return new Promise((resolve, reject) => {

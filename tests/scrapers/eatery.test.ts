@@ -75,3 +75,40 @@ test("parseEateryMenu day detection recovers substitution/drop, rejects insertio
   assert.deepEqual(far.menu.map((d) => d.day), ["Måndag"], "≥2 edits → content");
   assert.equal(far.menu[0].lines.length, 3);
 });
+
+// Eatery's Swedish menu vanished from the site for the whole of week 35
+// (2026-08-24 → 08-27: every build logged "no Lund_sv_V*.pdf link found"), and
+// a re-upload naming the file "Lund_sv_V35-2.pdf" would have looked exactly the
+// same to the old `Lund_sv_V\d+\.pdf` anchor. The pattern now tolerates a
+// suffix between the week number and the extension.
+test("parseEateryLanding accepts a re-uploaded PDF name (Lund_sv_V35-2.pdf)", () => {
+  for (const name of ["Lund_sv_V35-2.pdf", "Lund_sv_V35%20(1).pdf", "Lund-sv-V35.pdf"]) {
+    const html = `<html><body>
+      <a href="https://static.thatsup.website/462/1/${name}?v=17">Lunchmeny</a>
+    </body></html>`;
+    const { pdfUrl } = parseEateryLanding(html);
+    assert.equal(pdfUrl, `https://static.thatsup.website/462/1/${name}?v=17`);
+  }
+});
+
+// Elementor stores a second copy of the button href inside its escaped
+// data-settings JSON. If a template change leaves the URL only there, with no
+// real <a href>, the raw-HTML sweep still finds it — bounded so it can't run
+// backwards across the &quot; separators into the previous JSON key.
+test("parseEateryLanding falls back to the URL in Elementor's settings blob", () => {
+  const html = `<html><body><div class="btn" data-settings="{&quot;link&quot;:` +
+    `&quot;https://static.thatsup.website/462/1/Lund_sv_V36.pdf?v=17&quot;,` +
+    `&quot;label&quot;:&quot;Lunchmeny&quot;}"></div></body></html>`;
+  const { pdfUrl } = parseEateryLanding(html);
+  assert.equal(pdfUrl, "https://static.thatsup.website/462/1/Lund_sv_V36.pdf");
+});
+
+// The English PDF is NOT an acceptable substitute: parseEateryMenu keys on
+// uppercase Swedish day tokens, so it would yield an empty menu — worse than an
+// honest error card. A page carrying only Lund_eng must still throw.
+test("parseEateryLanding does not fall back to the English PDF", () => {
+  const html = `<html><body>
+    <a href="https://static.thatsup.website/462/1/Lund_eng_V36.pdf">Menu</a>
+  </body></html>`;
+  assert.throws(() => parseEateryLanding(html), /no Lund_sv_V\*\.pdf link found/);
+});
