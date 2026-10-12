@@ -1,0 +1,79 @@
+{
+  "note": "Meny 12/10 – 16/10",
+  "menu": [
+    {
+      "day": "Måndag",
+      "lines": [
+        "Veckans vegetariska: Rostad spetskål – sandefjordsås – pickles – rostad mandel – potatis – grana padano – örter",
+        "Månadens alternativ: Steak cheese sandwich – entrecôte – paprika – jalapeño – pepperjackost – dillpicklad gurka – silverlök – rostad lök – levain – ört",
+        "Teriyakirostad fläsksida – pickles – kimchimajo – broccoli – ris – sesam – koriander"
+      ]
+    },
+    {
+      "day": "Tisdag",
+      "lines": [
+        "Veckans vegetariska: Rostad spetskål – sandefjordsås – pickles – rostad mandel – potatis – grana padano – örter",
+        "Månadens alternativ: Steak cheese sandwich – entrecôte – paprika – jalapeño – pepperjackost – dillpicklad gurka – silverlök – rostad lök – levain – ört",
+        "Jerk chicken – tomat & mangosalsa – chilimajo – pickles – friterad tortilla – ris"
+      ]
+    },
+    {
+      "day": "Onsdag",
+      "lines": [
+        "Veckans vegetariska: Rostad spetskål – sandefjordsås – pickles – rostad mandel – potatis – grana padano – örter",
+        "Månadens alternativ: Steak cheese sandwich – entrecôte – paprika – jalapeño – pepperjackost – dillpicklad gurka – silverlök – rostad lök – levain – ört",
+        "Örtstekt fläskfilé – rostade rotfrukter – pickles – rostad lök – kycklingsky – potatisstomp"
+      ]
+    },
+    {
+      "day": "Torsdag",
+      "lines": [
+        "Veckans vegetariska: Rostad spetskål – sandefjordsås – pickles – rostad mandel – potatis – grana padano – örter",
+        "Månadens alternativ: Steak cheese sandwich – entrecôte – paprika – jalapeño – pepperjackost – dillpicklad gurka – silverlök – rostad lök – levain – ört",
+        "Råbiffstorsdag: Oxtartar – persiljeaioli – rostad beta – kapris – silverlök – fröer – ruccola – grana padano"
+      ]
+    },
+    {
+      "day": "Fredag",
+      "lines": [
+        "Veckans vegetariska: Rostad spetskål – sandefjordsås – pickles – rostad mandel – potatis – grana padano – örter",
+        "Månadens alternativ: Steak cheese sandwich – entrecôte – paprika – jalapeño – pepperjackost – dillpicklad gurka – silverlök – rostad lök – levain – ört",
+        "Nattbakad Oxkind – salsa roja – svarta bönor – majskräm – syrad lök – friterad tortilla – potatis"
+      ]
+    }
+  ],
+  "hours": {
+    "mon": [
+      {
+        "open": "11:00",
+        "close": "15:00"
+      }
+    ],
+    "tue": [
+      {
+        "open": "11:00",
+        "close": "15:00"
+      }
+    ],
+    "wed": [
+      {
+        "open": "11:00",
+        "close": "15:00"
+      }
+    ],
+    "thu": [
+      {
+        "open": "11:00",
+        "close": "15:00"
+      }
+    ],
+    "fri": [
+      {
+        "open": "11:00",
+        "close": "15:00"
+      }
+    ],
+    "sat": [],
+    "sun": []
+  }
+}

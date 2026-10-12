@@ -202,3 +202,11 @@ test("parseKantin does not read 'Månadens alternativ' as Måndag", () => {
   assert.deepEqual(menu.map((d) => d.day), ["Måndag"]);
   assert.deepEqual(menu[0].lines, ["Månadens alternativ: Räkor", "Köttbullar"]);
 });
+
+// 2026-10-12: the days moved out of <p>s into webmail-pasted <div>s, with
+// Monday's dish and Tuesday's label sharing one div — every <p> lookup missed
+// and the build threw "no day paragraphs found".
+test("parseKantin matches snapshot (days in webmail <div>s)", () => {
+  const html = readFixture("kantin-div.html");
+  matchSnapshot("kantin-div", parseKantin(html));
+});

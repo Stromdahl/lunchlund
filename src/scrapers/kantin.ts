@@ -111,6 +111,7 @@ export function parseKantin(html: string): ScrapedData {
       if (rest) extras.set(extraLbl, `${extraLbl}: ${rest}`);
     }
   });
+  if (menu.length === 0) menu.push(...parseDayStream($));
   if (extras.size) {
     const prefix = WEEKLY_EXTRAS
       .map((l) => extras.get(l))
@@ -129,6 +130,112 @@ export function parseKantin(html: string): ScrapedData {
   }
 
   return { note, menu, hours: HOURS };
+}
+
+// cheerio doesn't re-export domhandler's node type and domhandler isn't a
+// direct dependency (PnP won't resolve it), so lift it off load()'s signature.
+type AnyNode = Exclude<Parameters<typeof cheerio.load>[0], string | Buffer | unknown[]>;
+
+const BLOCK = /^(?:p|div|li|ul|ol|section|article|table|tr|td)$/;
+const HEADING = /^h[1-6]$/;
+
+/** One visual line of the page: its text, and the bold run that leads it. */
+type Line =
+  | { kind: "line"; text: string; lead: string }
+  | { kind: "blockEnd" }
+  | { kind: "heading" };
+
+/** Flatten the document into visual lines — split at <br> and block edges —
+ *  remembering each line's leading bold text, so a day label can be found
+ *  wherever the markup puts it. */
+function lines($: cheerio.CheerioAPI): Line[] {
+  const out: Line[] = [];
+  let text = "";
+  let lead = "";
+  let leadOpen = true;
+  const end = () => {
+    if (text) out.push({ kind: "line", text, lead });
+    text = lead = "";
+    leadOpen = true;
+  };
+  const visit = (node: AnyNode, bold: boolean) => {
+    if (node.type === "text") {
+      if (bold && leadOpen) lead += node.data;
+      else if (cleanText(node.data)) leadOpen = false;
+      text += node.data;
+      return;
+    }
+    if (node.type !== "tag") return;
+    if (node.name === "script" || node.name === "style") return;
+    if (node.name === "br") return end();
+    const inBold = bold || node.name === "b" || node.name === "strong";
+    if (HEADING.test(node.name)) {
+      end();
+      out.push({ kind: "heading" });
+      return;
+    }
+    const block = BLOCK.test(node.name);
+    if (block) end();
+    node.children.forEach((c) => visit(c, inBold));
+    if (block) {
+      end();
+      out.push({ kind: "blockEnd" });
+    }
+  };
+  $.root().children().each((_, n) => visit(n, false));
+  end();
+  return out;
+}
+
+/** Day menus from a page where the days aren't one-per-<p>. Kantin's
+ *  2026-10-12 menu, pasted from webmail, put each bold day label in a <div>,
+ *  sometimes sharing it with the previous day's dish:
+ *    <div><b>Måndag</b><br>dish<br><br><b>Tisdag</b></div><div>dish</div>
+ *  So walk visual lines: a line led by a bold day label opens a day (bold text
+ *  after the label, e.g. "Torsdag – råbiffstorsdag", is a subtitle); following
+ *  plain lines are its dish, until a blank line or block edge once a dish has
+ *  been seen, a heading, or another bold label. */
+function parseDayStream($: cheerio.CheerioAPI): DayMenu[] {
+  const menu: DayMenu[] = [];
+  let cur: { day: string; subtitle: string; dish: string[] } | undefined;
+  const finish = () => {
+    if (cur?.dish.length) {
+      const dish = cur.dish.join(" ");
+      const sub = cur.subtitle;
+      const line = sub ? `${sub.charAt(0).toUpperCase()}${sub.slice(1)}: ${dish}` : dish;
+      menu.push({ day: cur.day, lines: [line] });
+    }
+    cur = undefined;
+  };
+  for (const l of lines($)) {
+    if (l.kind === "heading") {
+      finish();
+      continue;
+    }
+    if (l.kind === "blockEnd") {
+      if (cur?.dish.length) finish();
+      continue;
+    }
+    const full = cleanText(l.text);
+    const lead = cleanText(l.lead);
+    if (lead && full.startsWith(lead)) {
+      const label = matchLabel(full, [...DAYS, ...WEEKLY_EXTRAS]);
+      if (label) {
+        finish();
+        if (DAYS.includes(label)) {
+          cur = { day: label, subtitle: stripLabel(lead, label), dish: [] };
+          const rest = full.slice(lead.length).replace(SEPARATOR, "").trim();
+          if (rest) cur.dish.push(rest);
+        }
+        continue;
+      }
+    }
+    if (!cur) continue;
+    if (full) cur.dish.push(full);
+    else if (cur.dish.length) finish();
+  }
+  finish();
+  return menu;
 }
 
 /** Find Kantin's whole-restaurant closure banner — a heading like
