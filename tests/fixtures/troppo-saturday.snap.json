@@ -1,0 +1,48 @@
+{
+  "note": "Lunch Week 42, 2026",
+  "price": "159–169kr",
+  "menu": [
+    {
+      "day": "Hela veckan",
+      "lines": [
+        "Char Sui Pork — Cantonese style BBQ pork, brown sauce, sesame, boiled egg, pak choi, choice of jasmine rice OR eggnoodles. (Chinese)",
+        "Chicken Stir-fry — curry paste, haricot verts, Thai basil, kaffir lime, chicken, rice & fried egg. (Thai)",
+        "VEG \"Chicken\" Stir-fry — curry paste, haricot verts, Thai basil, kaffir lime, soy protein, rice, choice to add a fried egg. (Thai)"
+      ]
+    }
+  ],
+  "hours": {
+    "mon": [
+      {
+        "open": "11:00",
+        "close": "14:00"
+      }
+    ],
+    "tue": [
+      {
+        "open": "11:00",
+        "close": "14:00"
+      }
+    ],
+    "wed": [
+      {
+        "open": "11:00",
+        "close": "14:00"
+      }
+    ],
+    "thu": [
+      {
+        "open": "11:00",
+        "close": "14:00"
+      }
+    ],
+    "fri": [
+      {
+        "open": "11:00",
+        "close": "14:00"
+      }
+    ],
+    "sat": [],
+    "sun": []
+  }
+}
