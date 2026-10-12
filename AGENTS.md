@@ -157,8 +157,10 @@ late in the current week, so a hard week-mismatch block would hide it.
 ### Troppo — `https://www.troppo.se/lunch`
 
 Webflow site with one weekly menu of 3 dishes available all weekdays. The
-menu block follows an h2 reading "Monday-Friday" or, since Troppo started
-Saturday lunch (2026-10), "Monday-Saturday". Each dish is a `<strong>` name
+menu block follows an h2 whose wording is hand-edited churn — "Monday-Friday",
+then "Monday-Saturday" and "SATURDAY-FRIDAY LUnch Menu" on the same day once
+Troppo started Saturday lunch (2026-10) — so `MENU_HEADING` accepts "Lunch
+Menu" or any English day-to-day range. Each dish is a `<strong>` name
 followed by `<br>`-separated description lines up to a blank line or an "or"
 divider — sometimes wrapped in `<em>`, sometimes plain text, so
 `descriptionAfter` reads text nodes rather than keying on `<em>`. The

@@ -53,6 +53,9 @@ function textOf(node: AnyNode): string {
   return "";
 }
 
+const DAY_EN = "(?:mon|tues|wednes|thurs|fri|satur|sun)day";
+const MENU_HEADING = new RegExp(`lunch\\s*menu|${DAY_EN}\\s*[-–]\\s*${DAY_EN}`, "i");
+
 export function parseTroppo(html: string): ScrapedData {
   const $ = cheerio.load(html);
 
@@ -77,18 +80,21 @@ export function parseTroppo(html: string): ScrapedData {
     }
   });
 
-  // The menu lives in a .rich-text block somewhere after the "Monday-Friday"
-  // h2 — usually nested one level inside the next sibling wrapper. Since
-  // Troppo added Saturday lunch (October 2026) the h2 reads "Monday-Saturday".
+  // The menu lives in a .rich-text block somewhere after the "… Lunch Menu"
+  // h2 — usually nested one level inside the next sibling wrapper. The day
+  // range in front is hand-edited and churns ("Monday-Friday", then
+  // "Monday-Saturday" and "SATURDAY-FRIDAY LUnch Menu" on the same day in
+  // October 2026), so accept "Lunch Menu" or any English day-to-day range
+  // (the spring 2026 heading was a bare "Monday-Friday").
   let container = $();
   $("h2").each((_, el) => {
-    if (/Monday\s*-\s*(?:Friday|Saturday)/i.test($(el).text())) {
+    if (MENU_HEADING.test($(el).text())) {
       container = $(el).nextAll().find(".rich-text").addBack(".rich-text").first();
       return false;
     }
   });
   if (!container.length) {
-    throw new Error("troppo: could not locate Monday-Friday/Saturday menu block");
+    throw new Error("troppo: could not locate the Lunch Menu block");
   }
 
   const lines: string[] = [];
