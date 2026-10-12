@@ -1,0 +1,531 @@
+[
+  {
+    "found": {
+      "name": "projects/pej-menu-display/databases/(default)/documents/organizations/yKtLIyA7nVuIA6Xh9f8k/items/8R8lSXFoilPo4L25v02N",
+      "fields": {
+        "name": {
+          "mapValue": {
+            "fields": {
+              "sv": {
+                "stringValue": "Citron- och rosmarinbakad kyckling"
+              },
+              "en": {
+                "stringValue": "(en)"
+              }
+            }
+          }
+        },
+        "description": {
+          "mapValue": {
+            "fields": {
+              "sv": {
+                "stringValue": "potatismos, rosmarinsky och gröna bönor med bakad lök"
+              },
+              "en": {
+                "stringValue": "(en)"
+              }
+            }
+          }
+        },
+        "status": {
+          "stringValue": "forSale"
+        }
+      }
+    },
+    "readTime": "2026-10-12T10:00:26.091906Z"
+  },
+  {
+    "found": {
+      "name": "projects/pej-menu-display/databases/(default)/documents/organizations/yKtLIyA7nVuIA6Xh9f8k/items/aP0KbzmRf7iKLKkzn24u",
+      "fields": {
+        "name": {
+          "mapValue": {
+            "fields": {
+              "sv": {
+                "stringValue": "Sesamstekt kungsfisk"
+              },
+              "en": {
+                "stringValue": "(en)"
+              }
+            }
+          }
+        },
+        "description": {
+          "mapValue": {
+            "fields": {
+              "sv": {
+                "stringValue": "rostad morot, krämig vitvinssås med miso och ingefära och kokt potatis med chili och citron"
+              },
+              "en": {
+                "stringValue": "(en)"
+              }
+            }
+          }
+        },
+        "status": {
+          "stringValue": "forSale"
+        }
+      }
+    },
+    "readTime": "2026-10-12T10:00:26.091906Z"
+  },
+  {
+    "found": {
+      "name": "projects/pej-menu-display/databases/(default)/documents/organizations/yKtLIyA7nVuIA6Xh9f8k/items/deJT8qktTiBGYqfzRGfz",
+      "fields": {
+        "name": {
+          "mapValue": {
+            "fields": {
+              "sv": {
+                "stringValue": "Krispig samosa"
+              },
+              "en": {
+                "stringValue": "(en)"
+              }
+            }
+          }
+        },
+        "description": {
+          "mapValue": {
+            "fields": {
+              "sv": {
+                "stringValue": "mangochutney, myntakräm och basmatiris"
+              },
+              "en": {
+                "stringValue": "(en)"
+              }
+            }
+          }
+        },
+        "status": {
+          "stringValue": "forSale"
+        }
+      }
+    },
+    "readTime": "2026-10-12T10:00:26.091906Z"
+  },
+  {
+    "found": {
+      "name": "projects/pej-menu-display/databases/(default)/documents/organizations/yKtLIyA7nVuIA6Xh9f8k/items/o7m7kwxmh2p6v72lQf7f",
+      "fields": {
+        "name": {
+          "mapValue": {
+            "fields": {
+              "sv": {
+                "stringValue": "Köttfärslimpa"
+              },
+              "en": {
+                "stringValue": "(en)"
+              }
+            }
+          }
+        },
+        "description": {
+          "mapValue": {
+            "fields": {
+              "sv": {
+                "stringValue": "bakad tomat, oliver, salladsost och zucchini, rostad vitlökskräm och rostad klyftpotatis"
+              },
+              "en": {
+                "stringValue": "(en)"
+              }
+            }
+          }
+        },
+        "status": {
+          "stringValue": "forSale"
+        }
+      }
+    },
+    "readTime": "2026-10-12T10:00:26.091906Z"
+  },
+  {
+    "found": {
+      "name": "projects/pej-menu-display/databases/(default)/documents/organizations/yKtLIyA7nVuIA6Xh9f8k/items/D928z0ZtMA04opg2gmzS",
+      "fields": {
+        "name": {
+          "mapValue": {
+            "fields": {
+              "sv": {
+                "stringValue": "Fröbakad kummel"
+              },
+              "en": {
+                "stringValue": "(en)"
+              }
+            }
+          }
+        },
+        "description": {
+          "mapValue": {
+            "fields": {
+              "sv": {
+                "stringValue": "västerbottenkräm, potatismos och strimlad morotssallad med dill och salladslök"
+              },
+              "en": {
+                "stringValue": "(en)"
+              }
+            }
+          }
+        },
+        "status": {
+          "stringValue": "forSale"
+        }
+      }
+    },
+    "readTime": "2026-10-12T10:00:26.091906Z"
+  },
+  {
+    "found": {
+      "name": "projects/pej-menu-display/databases/(default)/documents/organizations/yKtLIyA7nVuIA6Xh9f8k/items/oNpKSCYBgbWXzUaf3VyA",
+      "fields": {
+        "name": {
+          "mapValue": {
+            "fields": {
+              "sv": {
+                "stringValue": "Örtstekt gnocchi"
+              },
+              "en": {
+                "stringValue": "(en)"
+              }
+            }
+          }
+        },
+        "description": {
+          "mapValue": {
+            "fields": {
+              "sv": {
+                "stringValue": "krämig tomatsås, rostad aubergine, lagrad ost och gremolata"
+              },
+              "en": {
+                "stringValue": "(en)"
+              }
+            }
+          }
+        },
+        "status": {
+          "stringValue": "forSale"
+        }
+      }
+    },
+    "readTime": "2026-10-12T10:00:26.091906Z"
+  },
+  {
+    "found": {
+      "name": "projects/pej-menu-display/databases/(default)/documents/organizations/yKtLIyA7nVuIA6Xh9f8k/items/ovF9ErVkNgN5xQfjZnNW",
+      "fields": {
+        "name": {
+          "mapValue": {
+            "fields": {
+              "sv": {
+                "stringValue": "Yakiniku på högrev"
+              },
+              "en": {
+                "stringValue": "(en)"
+              }
+            }
+          }
+        },
+        "description": {
+          "mapValue": {
+            "fields": {
+              "sv": {
+                "stringValue": "soja- och ingefärsmarinerad broccoli, picklad lök och jasminris"
+              },
+              "en": {
+                "stringValue": "(en)"
+              }
+            }
+          }
+        },
+        "status": {
+          "stringValue": "forSale"
+        }
+      }
+    },
+    "readTime": "2026-10-12T10:00:26.091906Z"
+  },
+  {
+    "found": {
+      "name": "projects/pej-menu-display/databases/(default)/documents/organizations/yKtLIyA7nVuIA6Xh9f8k/items/MhE3rjXfOgVAm7JflsCF",
+      "fields": {
+        "name": {
+          "mapValue": {
+            "fields": {
+              "sv": {
+                "stringValue": "Fish & chips"
+              },
+              "en": {
+                "stringValue": "(en)"
+              }
+            }
+          }
+        },
+        "description": {
+          "mapValue": {
+            "fields": {
+              "sv": {
+                "stringValue": "krispig klyftpotatis, tartarsås, gröna ärtor och citron"
+              },
+              "en": {
+                "stringValue": "(en)"
+              }
+            }
+          }
+        },
+        "status": {
+          "stringValue": "forSale"
+        }
+      }
+    },
+    "readTime": "2026-10-12T10:00:26.091906Z"
+  },
+  {
+    "found": {
+      "name": "projects/pej-menu-display/databases/(default)/documents/organizations/yKtLIyA7nVuIA6Xh9f8k/items/Lsg4kUDJ0NipEBY81eMU",
+      "fields": {
+        "name": {
+          "mapValue": {
+            "fields": {
+              "sv": {
+                "stringValue": "Palak paneer"
+              },
+              "en": {
+                "stringValue": "(en)"
+              }
+            }
+          }
+        },
+        "description": {
+          "mapValue": {
+            "fields": {
+              "sv": {
+                "stringValue": "chilirostad pumpa, panoumi och basmatiris med rostade kokosflingor"
+              },
+              "en": {
+                "stringValue": "(en)"
+              }
+            }
+          }
+        },
+        "status": {
+          "stringValue": "forSale"
+        }
+      }
+    },
+    "readTime": "2026-10-12T10:00:26.091906Z"
+  },
+  {
+    "found": {
+      "name": "projects/pej-menu-display/databases/(default)/documents/organizations/yKtLIyA7nVuIA6Xh9f8k/items/XN6jj2wXQ78VznriJYAS",
+      "fields": {
+        "name": {
+          "mapValue": {
+            "fields": {
+              "sv": {
+                "stringValue": "Bibimbap på nötfärs"
+              },
+              "en": {
+                "stringValue": "(en)"
+              }
+            }
+          }
+        },
+        "description": {
+          "mapValue": {
+            "fields": {
+              "sv": {
+                "stringValue": "picklad gurka, böngroddar, kimchi, sesam, sojaägg och ris"
+              },
+              "en": {
+                "stringValue": "(en)"
+              }
+            }
+          }
+        },
+        "status": {
+          "stringValue": "forSale"
+        }
+      }
+    },
+    "readTime": "2026-10-12T10:00:26.091906Z"
+  },
+  {
+    "found": {
+      "name": "projects/pej-menu-display/databases/(default)/documents/organizations/yKtLIyA7nVuIA6Xh9f8k/items/VmABq8yHLH2b4SXbqgIG",
+      "fields": {
+        "name": {
+          "mapValue": {
+            "fields": {
+              "sv": {
+                "stringValue": "Ugnsbakad sej"
+              },
+              "en": {
+                "stringValue": "(en)"
+              }
+            }
+          }
+        },
+        "description": {
+          "mapValue": {
+            "fields": {
+              "sv": {
+                "stringValue": "saffranssås, fänkålssallad med räkor och körvel och rostad potatis med spenat och tomat"
+              },
+              "en": {
+                "stringValue": "(en)"
+              }
+            }
+          }
+        },
+        "status": {
+          "stringValue": "forSale"
+        }
+      }
+    },
+    "readTime": "2026-10-12T10:00:26.091906Z"
+  },
+  {
+    "found": {
+      "name": "projects/pej-menu-display/databases/(default)/documents/organizations/yKtLIyA7nVuIA6Xh9f8k/items/Av0OCOgucptTrVjk5zuN",
+      "fields": {
+        "name": {
+          "mapValue": {
+            "fields": {
+              "sv": {
+                "stringValue": "Pumpasoppa"
+              },
+              "en": {
+                "stringValue": "(en)"
+              }
+            }
+          }
+        },
+        "description": {
+          "mapValue": {
+            "fields": {
+              "sv": {
+                "stringValue": "kokos, ingefära och lime, couscous på blomkål och rostade frön"
+              },
+              "en": {
+                "stringValue": "(en)"
+              }
+            }
+          }
+        },
+        "status": {
+          "stringValue": "forSale"
+        }
+      }
+    },
+    "readTime": "2026-10-12T10:00:26.091906Z"
+  },
+  {
+    "found": {
+      "name": "projects/pej-menu-display/databases/(default)/documents/organizations/yKtLIyA7nVuIA6Xh9f8k/items/mhNwLsmeP4YIhKsh49gi",
+      "fields": {
+        "name": {
+          "mapValue": {
+            "fields": {
+              "sv": {
+                "stringValue": "Högrevsburgare"
+              },
+              "en": {
+                "stringValue": "(en)"
+              }
+            }
+          }
+        },
+        "description": {
+          "mapValue": {
+            "fields": {
+              "sv": {
+                "stringValue": "cheddar, jalapeñomajonnäs, picklad lök och pommes"
+              },
+              "en": {
+                "stringValue": "(en)"
+              }
+            }
+          }
+        },
+        "status": {
+          "stringValue": "forSale"
+        }
+      }
+    },
+    "readTime": "2026-10-12T10:00:26.091906Z"
+  },
+  {
+    "found": {
+      "name": "projects/pej-menu-display/databases/(default)/documents/organizations/yKtLIyA7nVuIA6Xh9f8k/items/2oJ8GHAW8Z0vRYTaOb3Q",
+      "fields": {
+        "name": {
+          "mapValue": {
+            "fields": {
+              "sv": {
+                "stringValue": "Bakad sej"
+              },
+              "en": {
+                "stringValue": "(en)"
+              }
+            }
+          }
+        },
+        "description": {
+          "mapValue": {
+            "fields": {
+              "sv": {
+                "stringValue": "jordnötssås, mangosallad, krispig lök och ris"
+              },
+              "en": {
+                "stringValue": "(en)"
+              }
+            }
+          }
+        },
+        "status": {
+          "stringValue": "forSale"
+        }
+      }
+    },
+    "readTime": "2026-10-12T10:00:26.091906Z"
+  },
+  {
+    "found": {
+      "name": "projects/pej-menu-display/databases/(default)/documents/organizations/yKtLIyA7nVuIA6Xh9f8k/items/ktDvLfYNPoTBsEZj2pu7",
+      "fields": {
+        "name": {
+          "mapValue": {
+            "fields": {
+              "sv": {
+                "stringValue": "Morots- och zucchinibiffar"
+              },
+              "en": {
+                "stringValue": "(en)"
+              }
+            }
+          }
+        },
+        "description": {
+          "mapValue": {
+            "fields": {
+              "sv": {
+                "stringValue": "rostad blomkål, harissakräm och bulgursallad"
+              },
+              "en": {
+                "stringValue": "(en)"
+              }
+            }
+          }
+        },
+        "status": {
+          "stringValue": "forSale"
+        }
+      }
+    },
+    "readTime": "2026-10-12T10:00:26.091906Z"
+  },
+  {
+    "missing": "projects/pej-menu-display/databases/(default)/documents/organizations/yKtLIyA7nVuIA6Xh9f8k/items/goneItem",
+    "readTime": "2026-10-12T10:00:26.091906Z"
+  }
+]

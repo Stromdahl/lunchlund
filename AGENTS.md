@@ -25,7 +25,7 @@ restaurant moves. `src/scrapers/index.ts` collects all descriptors into one
 Each scraper file is split into a **pure parser** and a thin **fetch + parse
 wrapper** invoked by the descriptor. The parser takes a raw HTML/text string
 and returns `ScrapedData` — that makes it testable without network I/O.
-Shared helpers live in `src/scrapers/lib.ts` (`fetchText`, `fetchBuffer`,
+Shared helpers live in `src/scrapers/lib.ts` (`fetchText`, `fetchJson`,
 `cleanText`). Swedish day names are centralised in `src/hours.ts` (`DAYS`,
 `WEEKDAYS`, `daySv`, `keyFromSv`).
 
@@ -54,28 +54,32 @@ Same Elementor template. Leaves `.lunch_price` blank.
 
 ### Eatery Lund — `https://eatery.se/anlaggningar/lund`
 
-The landing page only links out; the menu lives in a PDF at
-`https://static.thatsup.website/...Lund_sv_V<week>.pdf?v=<bust>`. The
-scraper:
+Since 2026-10 the menu is no longer a weekly PDF: eatery.se's "Lunchmeny"
+button links to Pej Menu Display (`https://menu.pej.io/ea/menus/lund`), an
+Angular app that reads Google Firestore in the browser. Pej has no public API
+(checked 2026-10-12), so the scraper reads the same documents over the
+Firestore REST API with the web API key the app ships:
 
-1. Fetches the landing page; `parseEateryLanding` picks the first
-   `Lund_sv_V*.pdf` href and the early-bird/ordinarie prices. The filename
-   pattern tolerates a suffix between the week number and the extension
-   (`Lund_sv_V35-2.pdf`, a re-upload) and, when no anchor matches, sweeps the
-   raw HTML — Elementor keeps a second copy of the href inside its escaped
-   `data-settings` JSON. It deliberately does **not** fall back to
-   `Lund_eng_V*.pdf`: `parseEateryMenu` keys on uppercase *Swedish* day tokens,
-   so the English PDF would parse to an empty menu, which reads worse than an
-   honest error card.
-2. Downloads the PDF.
-3. Shells out to `pdftotext -layout - -` (poppler-utils) for text.
-4. `parseEateryMenu` walks the text line-by-line; uppercase Swedish day
-   names (`MÅNDAG`, …) mark sections; subsequent non-boilerplate lines are
-   dishes.
+1. GET `organizations/yKtLIyA7nVuIA6Xh9f8k` (Eatery, slug `ea`) with
+   `mask.fieldPaths=menus`. `menus[]` holds every Eatery site; ours has slug
+   `lund` and `entries` keyed `YYYY-MM-DD`, each with
+   `informationBlocks[].libraryItemId` or `status: "Closed"`. The document is
+   ~1.5 MB because it carries all sites' full history.
+2. `parseEateryWeek` takes Mon–Fri of the current ISO week (judged in
+   Europe/Stockholm) and collects item ids.
+3. One `:batchGet` of `organizations/<id>/items/<itemId>` — dish text is in
+   `name.sv` / `description.sv`.
+4. `buildEateryMenu` joins them (`Name — description`; a closed day reads
+   "Stängt") and throws if the week has no dishes.
 
-Boilerplate-line patterns live in `isBoilerplate` in `src/scrapers/eatery.ts`
-— update if Eatery adds new chrome lines (current rules drop the LUNCH /
-MENY / LUND / salladsbuffé / app-rabatt lines).
+The price (early-bird/ordinarie) still comes from the eatery.se landing page
+via `parseEateryPrice`; that fetch is optional and can't fail the card.
+
+The Pej data model is internal and can change without notice — that's the
+likeliest break. If it does, open the menu page in a browser and watch the
+Firestore `Listen` requests to see the current collection/field names.
+Fixtures (`eatery-pej-org.json`, `eatery-pej-items.json`) are trimmed REST
+responses for week 42 of 2026.
 
 ### Kantin — `https://www.kantinlund.se/`
 
@@ -96,7 +100,17 @@ hours line and the contact line's `<b>info@…</b>` email):
   **no separator at all**. (This broke the 2026-09-01 build — every day
   paragraph was skipped and the scraper threw "no day paragraphs found".)
 
-`matchLabel`/`stripLabel` handle all three: a label matches when it leads the
+- Days in webmail-pasted `<div>`s instead of `<p>`s (2026-10-12):
+  `<div><b>Måndag</b><br>dish<br><br><b>Tisdag</b></div><div>dish</div>` — one
+  div can hold a day's dish *and* the next day's label. When the `<p>` pass
+  finds no days, `parseDayStream` flattens the page into visual lines (split at
+  `<br>` and block edges, remembering each line's leading bold run) and reads
+  them in order: a bold day label opens a day (bold text after the label, e.g.
+  "Torsdag – råbiffstorsdag", becomes a "Råbiffstorsdag:" prefix), plain lines
+  after it are the dish, ended by a blank line or block edge once a dish is
+  seen, a heading, or the next label. Fixture: `kantin-div.html`.
+
+`matchLabel`/`stripLabel` handle the three `<p>` shapes: a label matches when it leads the
 paragraph and the next character is not a lowercase letter (so the glued form
 is accepted but a compound like "Fredagsmys" is not), and the strip consumes
 any following run of whitespace, colon, or hyphen/dash variant. The guard is a
@@ -135,14 +149,19 @@ self-heals on the next successful build.
 
 Tripwire for the case this does NOT catch — a restaurant that closes
 *silently*, just leaving last week's menu up with no banner. The menu's
-week heading (Kantin's `note`, the elementor sites' "Lunchmeny V21", Eatery's
-`Lund_sv_V<week>.pdf`) is the signal there: a declared week that isn't the
-current ISO week. Not built — restaurants legitimately post next week's menu
+week heading (Kantin's `note`, the elementor sites' "Lunchmeny V21") is the
+signal there: a declared week that isn't the current ISO week. (Eatery is
+immune: Pej entries are dated, so last week's dishes are never read.) Not built — restaurants legitimately post next week's menu
 late in the current week, so a hard week-mismatch block would hide it.
 
 ### Troppo — `https://www.troppo.se/lunch`
 
 Webflow site with one weekly menu of 3 dishes available all weekdays. The
+menu block follows an h2 reading "Monday-Friday" or, since Troppo started
+Saturday lunch (2026-10), "Monday-Saturday". Each dish is a `<strong>` name
+followed by `<br>`-separated description lines up to a blank line or an "or"
+divider — sometimes wrapped in `<em>`, sometimes plain text, so
+`descriptionAfter` reads text nodes rather than keying on `<em>`. The
 parser returns a single `DayMenu` labelled "Hela veckan"; the renderer
 treats any non-Swedish-weekday label as a whole-week menu (the
 `isWholeWeekMenu` heuristic in `src/render.ts`).
@@ -205,8 +224,7 @@ of the menu. Either way the CLI prints `<source>: FAILED — …` to stderr.
 
 Most likely things to break:
 - A site redesigns and drops the CSS classes the parser keys on.
-- Eatery changes the PDF filename pattern (no longer `Lund_sv_V*.pdf`).
-- `pdftotext` is missing on the host (Eatery only).
+- Pej changes its Firestore layout (Eatery) — see the Eatery section.
 - The scheduled build lands in a nightly window (~00:00–02:00 Stockholm,
   observed 2026-06-03…05) where the hosts reject requests: `503` from
   one.com (Kantin, Laziza), `415` from GlobalConnect (Bricks, Edison,

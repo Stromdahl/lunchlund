@@ -23,14 +23,12 @@ Flags:
 ## Requirements
 
 - Node 20+
-- `pdftotext` from `poppler-utils` (Debian/Ubuntu: `sudo apt install poppler-utils`)
-  — used to extract the Eatery PDF.
 
 ## Layout
 
 - `src/scrapers/bricks.ts` — fetches and parses brickseatery.se HTML.
-- `src/scrapers/eatery.ts` — fetches eatery.se, finds the current weekly PDF,
-  shells out to `pdftotext -layout`, and parses the resulting text.
+- `src/scrapers/eatery.ts` — reads Eatery's Pej Menu Display data (Firestore
+  REST) for the current week, plus the price from eatery.se.
 - `src/scrape.ts` — runs both scrapers in parallel and collects errors.
 - `src/render.ts` — emits the static HTML (inline CSS, no JS).
 - `src/index.ts` — CLI entry point.

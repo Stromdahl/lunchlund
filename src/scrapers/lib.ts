@@ -27,13 +27,18 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 /** Fetch with browser-ish headers, a per-attempt timeout, and a short
  *  exponential backoff on transient (network / 5xx / 429) failures. Throws
  *  `${label}: ${status} ${statusText}` on a non-retryable or final non-2xx. */
-async function fetchOk(url: string, label: string): Promise<Response> {
+async function fetchOk(
+  url: string,
+  label: string,
+  init: { method?: string; body?: string; headers?: Record<string, string> } = {},
+): Promise<Response> {
   let last: Error | undefined;
   for (let attempt = 1; attempt <= MAX_TRIES; attempt++) {
     let res: Response;
     try {
       res = await fetch(url, {
-        headers: COMMON_HEADERS,
+        ...init,
+        headers: { ...COMMON_HEADERS, ...init.headers },
         signal: AbortSignal.timeout(TIMEOUT_MS),
       });
     } catch (e) {
@@ -56,10 +61,25 @@ export async function fetchText(url: string, label: string): Promise<string> {
   return res.text();
 }
 
-/** Fetch a URL as bytes (for binary content like PDFs). */
-export async function fetchBuffer(url: string, label: string): Promise<Buffer> {
-  const res = await fetchOk(url, label);
-  return Buffer.from(await res.arrayBuffer());
+/** Fetch a URL as parsed JSON — a GET, or a POST when `body` is given (sent
+ *  as JSON). Throws like fetchText on non-2xx. */
+export async function fetchJson(
+  url: string,
+  label: string,
+  body?: unknown,
+): Promise<unknown> {
+  const res = await fetchOk(
+    url,
+    label,
+    body === undefined
+      ? { headers: { accept: "application/json" } }
+      : {
+          method: "POST",
+          body: JSON.stringify(body),
+          headers: { accept: "application/json", "content-type": "application/json" },
+        },
+  );
+  return res.json();
 }
 
 // Strip the small ZWJ/ZWNJ/word-joiner family of zero-width characters (sites

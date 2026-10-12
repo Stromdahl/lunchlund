@@ -1,0 +1,45 @@
+{
+  "note": "Lunchmeny V42",
+  "menu": [
+    {
+      "day": "Måndag",
+      "lines": [
+        "Citron- och rosmarinbakad kyckling — potatismos, rosmarinsky och gröna bönor med bakad lök",
+        "Sesamstekt kungsfisk — rostad morot, krämig vitvinssås med miso och ingefära och kokt potatis med chili och citron",
+        "Krispig samosa — mangochutney, myntakräm och basmatiris"
+      ]
+    },
+    {
+      "day": "Tisdag",
+      "lines": [
+        "Köttfärslimpa — bakad tomat, oliver, salladsost och zucchini, rostad vitlökskräm och rostad klyftpotatis",
+        "Fröbakad kummel — västerbottenkräm, potatismos och strimlad morotssallad med dill och salladslök",
+        "Örtstekt gnocchi — krämig tomatsås, rostad aubergine, lagrad ost och gremolata"
+      ]
+    },
+    {
+      "day": "Onsdag",
+      "lines": [
+        "Yakiniku på högrev — soja- och ingefärsmarinerad broccoli, picklad lök och jasminris",
+        "Fish & chips — krispig klyftpotatis, tartarsås, gröna ärtor och citron",
+        "Palak paneer — chilirostad pumpa, panoumi och basmatiris med rostade kokosflingor"
+      ]
+    },
+    {
+      "day": "Torsdag",
+      "lines": [
+        "Bibimbap på nötfärs — picklad gurka, böngroddar, kimchi, sesam, sojaägg och ris",
+        "Ugnsbakad sej — saffranssås, fänkålssallad med räkor och körvel och rostad potatis med spenat och tomat",
+        "Pumpasoppa — kokos, ingefära och lime, couscous på blomkål och rostade frön"
+      ]
+    },
+    {
+      "day": "Fredag",
+      "lines": [
+        "Högrevsburgare — cheddar, jalapeñomajonnäs, picklad lök och pommes",
+        "Bakad sej — jordnötssås, mangosallad, krispig lök och ris",
+        "Morots- och zucchinibiffar — rostad blomkål, harissakräm och bulgursallad"
+      ]
+    }
+  ]
+}

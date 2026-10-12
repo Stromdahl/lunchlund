@@ -1,0 +1,311 @@
+{
+  "name": "projects/pej-menu-display/databases/(default)/documents/organizations/yKtLIyA7nVuIA6Xh9f8k",
+  "fields": {
+    "menus": {
+      "arrayValue": {
+        "values": [
+          {
+            "mapValue": {
+              "fields": {
+                "slug": {
+                  "stringValue": "kista-gate"
+                },
+                "entries": {
+                  "mapValue": {
+                    "fields": {
+                      "2026-10-12": {
+                        "mapValue": {
+                          "fields": {
+                            "informationBlocks": {
+                              "arrayValue": {
+                                "values": [
+                                  {
+                                    "mapValue": {
+                                      "fields": {
+                                        "libraryItemId": {
+                                          "stringValue": "kistaItem"
+                                        }
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "mapValue": {
+              "fields": {
+                "slug": {
+                  "stringValue": "lund"
+                },
+                "menuTitle": {
+                  "mapValue": {
+                    "fields": {
+                      "sv": {
+                        "stringValue": "Lunchmeny"
+                      }
+                    }
+                  }
+                },
+                "entries": {
+                  "mapValue": {
+                    "fields": {
+                      "2026-10-12": {
+                        "mapValue": {
+                          "fields": {
+                            "informationBlocks": {
+                              "arrayValue": {
+                                "values": [
+                                  {
+                                    "mapValue": {
+                                      "fields": {
+                                        "libraryItemId": {
+                                          "stringValue": "8R8lSXFoilPo4L25v02N"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "mapValue": {
+                                      "fields": {
+                                        "libraryItemId": {
+                                          "stringValue": "aP0KbzmRf7iKLKkzn24u"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "mapValue": {
+                                      "fields": {
+                                        "libraryItemId": {
+                                          "stringValue": "deJT8qktTiBGYqfzRGfz"
+                                        }
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "2026-10-13": {
+                        "mapValue": {
+                          "fields": {
+                            "informationBlocks": {
+                              "arrayValue": {
+                                "values": [
+                                  {
+                                    "mapValue": {
+                                      "fields": {
+                                        "libraryItemId": {
+                                          "stringValue": "o7m7kwxmh2p6v72lQf7f"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "mapValue": {
+                                      "fields": {
+                                        "libraryItemId": {
+                                          "stringValue": "D928z0ZtMA04opg2gmzS"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "mapValue": {
+                                      "fields": {
+                                        "libraryItemId": {
+                                          "stringValue": "oNpKSCYBgbWXzUaf3VyA"
+                                        }
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "2026-10-14": {
+                        "mapValue": {
+                          "fields": {
+                            "informationBlocks": {
+                              "arrayValue": {
+                                "values": [
+                                  {
+                                    "mapValue": {
+                                      "fields": {
+                                        "libraryItemId": {
+                                          "stringValue": "ovF9ErVkNgN5xQfjZnNW"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "mapValue": {
+                                      "fields": {
+                                        "libraryItemId": {
+                                          "stringValue": "MhE3rjXfOgVAm7JflsCF"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "mapValue": {
+                                      "fields": {
+                                        "libraryItemId": {
+                                          "stringValue": "Lsg4kUDJ0NipEBY81eMU"
+                                        }
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "2026-10-15": {
+                        "mapValue": {
+                          "fields": {
+                            "informationBlocks": {
+                              "arrayValue": {
+                                "values": [
+                                  {
+                                    "mapValue": {
+                                      "fields": {
+                                        "libraryItemId": {
+                                          "stringValue": "XN6jj2wXQ78VznriJYAS"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "mapValue": {
+                                      "fields": {
+                                        "libraryItemId": {
+                                          "stringValue": "VmABq8yHLH2b4SXbqgIG"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "mapValue": {
+                                      "fields": {
+                                        "libraryItemId": {
+                                          "stringValue": "Av0OCOgucptTrVjk5zuN"
+                                        }
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "2026-10-16": {
+                        "mapValue": {
+                          "fields": {
+                            "informationBlocks": {
+                              "arrayValue": {
+                                "values": [
+                                  {
+                                    "mapValue": {
+                                      "fields": {
+                                        "libraryItemId": {
+                                          "stringValue": "mhNwLsmeP4YIhKsh49gi"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "mapValue": {
+                                      "fields": {
+                                        "libraryItemId": {
+                                          "stringValue": "2oJ8GHAW8Z0vRYTaOb3Q"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "mapValue": {
+                                      "fields": {
+                                        "libraryItemId": {
+                                          "stringValue": "ktDvLfYNPoTBsEZj2pu7"
+                                        }
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "2026-10-17": {
+                        "mapValue": {
+                          "fields": {
+                            "informationBlocks": {
+                              "arrayValue": {}
+                            },
+                            "status": {
+                              "stringValue": "Closed"
+                            }
+                          }
+                        }
+                      },
+                      "2026-10-18": {
+                        "mapValue": {
+                          "fields": {
+                            "informationBlocks": {
+                              "arrayValue": {}
+                            },
+                            "status": {
+                              "stringValue": "Closed"
+                            }
+                          }
+                        }
+                      },
+                      "2026-10-09": {
+                        "mapValue": {
+                          "fields": {
+                            "informationBlocks": {
+                              "arrayValue": {
+                                "values": [
+                                  {
+                                    "mapValue": {
+                                      "fields": {
+                                        "libraryItemId": {
+                                          "stringValue": "lastWeekItem"
+                                        }
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
