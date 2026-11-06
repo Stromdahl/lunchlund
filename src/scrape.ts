@@ -1,24 +1,21 @@
+import { readFile } from "node:fs/promises";
 import { Restaurant, ScrapedData, ScrapeResult, ScraperDescriptor } from "./types";
 import { SCRAPERS } from "./scrapers";
 import { sameIsoWeek } from "./week";
 
-// The build reads its own last published JSON to recover a last-known-good
-// menu when a fresh scrape fails. This is the *project* Pages artifact this
-// pipeline writes — NOT the short user-root mirror, which is a separate,
-// less-frequently-updated copy.
-const CACHE_URL = "https://stromdahl.github.io/lunchlund/lunchlund.json";
-
 type CacheEntry = Pick<Restaurant, "menu" | "note" | "price" | "hours" | "asOf">;
 
-/** Fetch the previously published menus, keyed by restaurant name. Never
- *  throws: a missing / unreachable / malformed cache yields `null`, which
- *  collapses the fallback to today's behaviour (an error card). */
-async function loadCache(): Promise<Map<string, Restaurant> | null> {
+/** Read the previous run's JSON output from `path`, keyed by restaurant
+ *  name. Never throws: a missing / empty / malformed file yields `null`, which
+ *  collapses the fallback to an error card. */
+export async function loadCache(
+  path: string,
+): Promise<Map<string, Restaurant> | null> {
   try {
-    const res = await fetch(CACHE_URL, { signal: AbortSignal.timeout(10_000) });
-    if (!res.ok) return null;
-    const data = (await res.json()) as { restaurants?: Restaurant[] };
-    if (!Array.isArray(data.restaurants)) return null;
+    const data = JSON.parse(await readFile(path, "utf8")) as {
+      restaurants?: Restaurant[];
+    };
+    if (!Array.isArray(data?.restaurants)) return null;
     const map = new Map<string, Restaurant>();
     for (const r of data.restaurants) {
       if (r && typeof r.name === "string") map.set(r.name, r);
@@ -76,11 +73,14 @@ export function resolveRestaurant(
   return { ...identity, menu: [], error };
 }
 
-export async function scrapeAll(now: Date = new Date()): Promise<ScrapeResult> {
+export async function scrapeAll(
+  cachePath: string,
+  now: Date = new Date(),
+): Promise<ScrapeResult> {
   const settled = await Promise.allSettled(SCRAPERS.map((s) => s.scrape()));
-  // Only pay for the cache fetch when something actually failed.
+  // Only read the cache when something actually failed.
   const cache = settled.some((r) => r.status === "rejected")
-    ? await loadCache()
+    ? await loadCache(cachePath)
     : null;
   const restaurants = settled.map((r, i) =>
     resolveRestaurant(SCRAPERS[i], r, cache, now),
