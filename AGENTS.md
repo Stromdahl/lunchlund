@@ -4,8 +4,8 @@
 
 A small TypeScript tool that scrapes lunch menus from seven restaurants near
 Mobilvägen 10 in Lund (Ideon / Brunnshög) and writes `dist/index.html`,
-`dist/lunchlund.json`, and `dist/lunchlund.xml` (RSS). Designed to be
-cron-run and published as a static page.
+`dist/lunchlund.json`, and `dist/lunchlund.xml` (RSS). Built and published
+on radon by a systemd timer (see Deployment).
 
 ## Architecture
 
@@ -94,7 +94,7 @@ hours line and the contact line's `<b>info@…</b>` email):
 - Pasted from webmail: `<p><span…><strong>måndag</strong> – dish…</span></p>`
   — the strong is buried in nested `oneComWebmail-*` `<span>`s, the day name
   is lowercased, and an en-dash separates the dish. (This layout broke the
-  2026-06-01 cron run.)
+  2026-06-01 run.)
 - Bold closed by a line break: `<strong>Måndag<br /></strong>dish…`. cheerio's
   `.text()` drops the `<br>`, so the paragraph reads `MåndagKalv tri-tip` with
   **no separator at all**. (This broke the 2026-09-01 build — every day
@@ -224,36 +224,33 @@ of the menu. Either way the CLI prints `<source>: FAILED — …` to stderr.
 Most likely things to break:
 - A site redesigns and drops the CSS classes the parser keys on.
 - Pej changes its Firestore layout (Eatery) — see the Eatery section.
-- The scheduled build lands in a nightly window (~00:00–02:00 Stockholm,
-  observed 2026-06-03…05) where the hosts reject requests: `503` from
+- The scheduled run lands in a nightly window (~00:00-02:00 Stockholm,
+  observed 2026-06-03...05) where the hosts reject requests: `503` from
   one.com (Kantin, Laziza), `415` from GlobalConnect (Bricks, Edison,
-  Inspira, Aiko). Daytime runs from the same GitHub runners were fine,
-  so it's host-side and time-correlated — but the cause (maintenance vs.
-  bot mitigation) is unconfirmed. The cron is at 03:17 Stockholm to stay
-  clear; the last-known-good fallback now keeps a same-week menu on the page
-  through such a window instead of an error card, but a `gh workflow run
-  build.yml` during the day still gets *fresh* menus and repopulates the cache
-  (in-build retries alone won't outlast a multi-hour window). Recurring 03:17
-  failures would point at IP-based blocking instead. Note the fallback can
-  only show what the last *successful* build cached — if every build in a
-  week's run failed, there's nothing same-week to fall back to.
-- **The scheduled build stops running at all.** GitHub disables a workflow's
-  `schedule:` triggers after 60 days without repo activity. That happened on
-  2026-08-27 (last commit 2026-06-27) and the page silently served week-35
-  menus into September — no error cards, nothing wrong-looking, just old food.
-  This repo goes months between commits, so it will recur. `gh workflow list
-  --all` shows the state (`disabled_inactivity`); `gh workflow enable
-  "Build and deploy"` turns it back on. **Check this before debugging a
-  scraper** whenever the page looks stale.
-
-  The page now says so itself: the inline script counts the weekdays between
-  the build date and today (Europe/Stockholm) and injects a `.page-stale`
-  banner into the header when that count is ≥ 1. It's deliberately *not* a
-  plain date comparison — Friday's build is correct content all weekend, and a
-  banner that cried stale every Saturday would be ignored by the Monday it
+  Inspira, Aiko). Daytime runs were fine, so it's host-side and
+  time-correlated; the cause is unconfirmed. The radon timer runs only on
+  weekday mornings (07:15, 10:00), clear of that window, and the last-known-good
+  fallback keeps a same-week menu through bad windows. It can only show what the
+  last *successful* run cached. Run `systemctl start lunchlund` on radon for
+  fresh menus. Recurring failures in the daytime would point at IP-based blocking.
+- **The timer stops running.** The page itself says so: the inline script counts
+  the weekdays between the build date and today (Europe/Stockholm) and injects a
+  `.page-stale` banner into the header when that count is >= 1. It's deliberately
+  *not* a plain date comparison: Friday's build is correct content all weekend,
+  and a banner that cried stale every Saturday would be ignored by the Monday it
   finally mattered. Being client-side, it's invisible with JS off; the
   `render.test.ts` stale-banner tests run the real inline script against a DOM
-  stub with the clock pinned.
+  stub with the clock pinned. On a stale page, check `systemctl list-timers
+  lunchlund` and `journalctl -u lunchlund` on radon before debugging a scraper.
+
+## Deployment
+
+radon (NixOS, config in the fleet repo `projects/fleet`) imports
+`nixosModules.default` and runs `services.lunchlund` on a timer Mon-Fri 07:15
+and 10:00 Europe/Stockholm, serving the output as the Site
+`https://lunchlund.stromdahl.io/` (`/`, `/lunchlund.json`, `/lunchlund.xml`).
+GitHub Pages is retired. CI is `.github/workflows/nix.yml` only (`nix build`,
+whose checkPhase runs `yarn test`), on push.
 
 ## Tests
 

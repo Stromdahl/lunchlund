@@ -87,5 +87,16 @@ shows the last run's log.
 - `src/index.ts` — CLI entry point.
 - `src/types.ts` — shared types.
 
-To publish, point any static host at `dist/`, or cron the build and rsync
-the result.
+## Deployment
+
+The live page is <https://lunchlund.stromdahl.io/>, served from radon. radon's
+NixOS config lives in the fleet repo (`projects/fleet`): it imports
+`nixosModules.default` from this flake, enables `services.lunchlund` with a
+timer Mon-Fri 07:15 and 10:00 Europe/Stockholm, and serves `outputDir` as the
+Site `lunchlund.stromdahl.io`. To ship a change, push here, then bump the
+`lunchlund` flake input in the fleet repo and deploy radon. To refresh the menus
+immediately: `systemctl start lunchlund` on radon.
+
+CI (`.github/workflows/nix.yml`) runs `nix build` on every push; its
+`checkPhase` runs `yarn test`. There is no GitHub Pages deploy and no scheduled
+workflow.

@@ -1,11 +1,10 @@
 name: Nix build
 
-# Builds the flake package; its checkPhase runs `yarn test`, so a red test
-# fails this job. Separate from build.yml so it doesn't inherit that
-# workflow's schedule, Pages permissions or concurrency group.
+# The only CI. Builds the flake package; its checkPhase runs `yarn test`, so
+# tests are covered here too and a red test fails this job. Push only: the
+# page itself is built and published on radon (see README).
 on:
   push:
-  workflow_dispatch:
 
 permissions:
   contents: read
