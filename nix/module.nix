@@ -28,14 +28,18 @@ let
   # untouched. Old builds are deleted only after a successful swap.
   # "Failure" means lunchlund exits non-zero; a scraper that can't reach its
   # site still yields an error card (or a same-week fallback) and exit 0.
+  # The build dir is made with plain mkdir, not `mktemp -d` + chmod: mktemp
+  # makes it 0700, and chmod can't fix that because DynamicUser implies
+  # RestrictSUIDSGID, which refuses any chmod carrying the inherited setgid
+  # bit. mkdir under UMask=0007 gives 0770 and inherits setgid + group itself.
   run = pkgs.writeShellScript "lunchlund-run" ''
     set -euo pipefail
     root=${root}
-    tmp=$(mktemp -d "$root/build-XXXXXX")
+    tmp=$(mktemp -u "$root/build-XXXXXX")
+    mkdir -- "$tmp"
     swapped=
     cleanup() { [ -n "$swapped" ] || rm -rf -- "$tmp"; }
     trap cleanup EXIT
-    chmod 2770 "$tmp"
 
     ${lib.getExe cfg.package} --out "$tmp" --cache "$root/current/lunchlund.json"
 
