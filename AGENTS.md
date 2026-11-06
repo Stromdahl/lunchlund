@@ -189,7 +189,9 @@ Three layers soften a scrape failure, in order of how much they help the
 person looking at the live page:
 
 1. **Last-known-good fallback** (`src/scrape.ts`). When a scraper fails,
-   `scrapeAll` reads the previous run's `lunchlund.json` from local disk (`loadCache(path)`; `--cache FILE`, default `<out>/lunchlund.json`) and reuses that restaurant's last menu instead of showing nothing. Guard:
+   `scrapeAll` reads the previous run's `lunchlund.json` from local disk
+   (`loadCache(path)`; `--cache FILE`, default `<out>/lunchlund.json`) and
+   reuses that restaurant's last menu instead of showing nothing. Guard:
    the cached entry must carry a real menu fetched in the **same ISO week**
    (a menu is weekly, so same-week data is still right; last week's is not).
    Each entry carries `asOf` (the time it was actually fetched successfully);
@@ -224,8 +226,8 @@ of the menu. Either way the CLI prints `<source>: FAILED — …` to stderr.
 Most likely things to break:
 - A site redesigns and drops the CSS classes the parser keys on.
 - Pej changes its Firestore layout (Eatery) — see the Eatery section.
-- The scheduled run lands in a nightly window (~00:00-02:00 Stockholm,
-  observed 2026-06-03...05) where the hosts reject requests: `503` from
+- The scheduled run lands in a nightly window (~00:00–02:00 Stockholm,
+  observed 2026-06-03…05) where the hosts reject requests: `503` from
   one.com (Kantin, Laziza), `415` from GlobalConnect (Bricks, Edison,
   Inspira, Aiko). Daytime runs were fine, so it's host-side and
   time-correlated; the cause is unconfirmed. The radon timer runs only on
@@ -235,7 +237,7 @@ Most likely things to break:
   fresh menus. Recurring failures in the daytime would point at IP-based blocking.
 - **The timer stops running.** The page itself says so: the inline script counts
   the weekdays between the build date and today (Europe/Stockholm) and injects a
-  `.page-stale` banner into the header when that count is >= 1. It's deliberately
+  `.page-stale` banner into the header when that count is ≥ 1. It's deliberately
   *not* a plain date comparison: Friday's build is correct content all weekend,
   and a banner that cried stale every Saturday would be ignored by the Monday it
   finally mattered. Being client-side, it's invisible with JS off; the
