@@ -189,10 +189,7 @@ Three layers soften a scrape failure, in order of how much they help the
 person looking at the live page:
 
 1. **Last-known-good fallback** (`src/scrape.ts`). When a scraper fails,
-   `scrapeAll` fetches the build's own previously published JSON
-   (`https://stromdahl.github.io/lunchlund/lunchlund.json` — the *project*
-   Pages artifact this pipeline writes, **not** the short user-root mirror)
-   and reuses that restaurant's last menu instead of showing nothing. Guard:
+   `scrapeAll` reads the previous run's `lunchlund.json` from local disk (`loadCache(path)`; `--cache FILE`, default `<out>/lunchlund.json`) and reuses that restaurant's last menu instead of showing nothing. Guard:
    the cached entry must carry a real menu fetched in the **same ISO week**
    (a menu is weekly, so same-week data is still right; last week's is not).
    Each entry carries `asOf` (the time it was actually fetched successfully);
@@ -200,7 +197,7 @@ person looking at the live page:
    chain survives repeated failed builds without ever looking fresh, and the
    week-boundary guard still fires. Rendered as a normal card plus a muted
    "Kunde inte uppdatera idag — visar menyn från <date>" note (`.stale-note`,
-   `stale: true`). The cache fetch never throws: a missing/garbage/unreachable
+   `stale: true`). The cache load never throws: a missing/garbage/unreachable
    cache → no fallback → the plain error card (the old behaviour). The pure
    merge lives in `resolveRestaurant` (unit-tested in `tests/scrape.test.ts`).
    This is the only layer that changes what a user sees on an *already-baked*

@@ -19,6 +19,9 @@ xdg-open dist/index.html   # or open it in any browser
 Flags:
 
 - `--out DIR` — change the output directory (default `dist/`).
+- `--cache FILE` — previous `lunchlund.json` to fall back on when a scraper
+  fails (default `<out>/lunchlund.json`, so two `yarn build` runs in a row
+  chain automatically). Missing or malformed files are treated as no cache.
 
 ## Requirements
 
