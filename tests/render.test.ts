@@ -165,3 +165,20 @@ test("stale banner counts the weekdays a build has been missed", () => {
   const fri = runPageScript(out, "2026-08-31T09:00:00+02:00"); // Monday
   assert.match(fri!.innerHTML, /1 vardag sedan/, "singular for a single missed day");
 });
+
+test("render links the page to the lunchlund.stromdahl.io Site feeds", () => {
+  const html = render({
+    fetchedAt: new Date("2026-06-09T08:00:00Z"),
+    restaurants: [
+      {
+        name: "Place",
+        address: "Mobilvägen 1",
+        website: "https://example.com/",
+        menu: [{ day: "Hela veckan", lines: ["Sallad"] }],
+      },
+    ],
+  });
+  assert.match(html, /href="https:\/\/lunchlund\.stromdahl\.io\/lunchlund\.json"/);
+  assert.match(html, /href="https:\/\/lunchlund\.stromdahl\.io\/lunchlund\.xml"/);
+  assert.doesNotMatch(html, /github\.io/);
+});
