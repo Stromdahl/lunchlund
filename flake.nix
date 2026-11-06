@@ -17,6 +17,12 @@
 
       checks = forAllSystems (pkgs: {
         lunchlund = self.packages.${pkgs.stdenv.hostPlatform.system}.lunchlund;
+        module = import ./nix/module-check.nix {
+          inherit pkgs nixpkgs;
+          module = self.nixosModules.default;
+        };
       });
+
+      nixosModules.default = import ./nix/module.nix { inherit self; };
     };
 }
