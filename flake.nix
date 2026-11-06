@@ -21,6 +21,10 @@
           inherit pkgs nixpkgs;
           module = self.nixosModules.default;
         };
+        module-vm = import ./nix/module-vm-test.nix {
+          inherit pkgs;
+          module = self.nixosModules.default;
+        };
       });
 
       nixosModules.default = import ./nix/module.nix { inherit self; };
