@@ -290,6 +290,12 @@ nixpkgs' `yarn-berry_4.fetchYarnBerryDeps` + `yarnBerryConfigHook`, compiles
 with `yarn compile` (tsc → `dist-js/`), runs `yarn test` in `checkPhase` (a red
 test fails `nix build`), and wraps `node --require .pnp.cjs dist-js/index.js`.
 
+- `nixosModules.default` (`nix/module.nix`) is `services.lunchlund`; options
+  are documented in the README. `checks` also holds `module` (eval-time
+  assertions on the unit, `nix/module-check.nix`) and `module-vm` (a NixOS VM
+  test with a stub binary: atomic publish, `--cache` chaining, a failed run
+  keeps `current`, web server group can read; `nix/module-vm-test.nix`, about
+  a minute without KVM).
 - **Changed `yarn.lock`?** The offline-cache hash in `package.nix` goes stale
   (the build fails with "fetchYarnDeps hash is out of date"). Set it to
   `lib.fakeHash`, run `nix build`, paste the `got:` hash.
