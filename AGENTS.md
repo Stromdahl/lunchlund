@@ -285,6 +285,21 @@ Use **yarn**, not npm. The project ships with `yarn.lock`; do not introduce
 SDK shims live in `.yarn/sdks/` — `yarn dlx @yarnpkg/sdks base` regenerates
 them; point your editor's tsserver at `.yarn/sdks/typescript/lib/tsserver.js`.
 
+## Nix
+
+`flake.nix` exports `packages.x86_64-linux.default` (executable `lunchlund`,
+built by `package.nix`) and the same package under `checks`. It uses
+nixpkgs' `yarn-berry_4.fetchYarnBerryDeps` + `yarnBerryConfigHook`, compiles
+with `yarn compile` (tsc → `dist-js/`), runs `yarn test` in `checkPhase` (a red
+test fails `nix build`), and wraps `node --require .pnp.cjs dist-js/index.js`.
+
+- **Changed `yarn.lock`?** The offline-cache hash in `package.nix` goes stale
+  (the build fails with "fetchYarnDeps hash is out of date"). Set it to
+  `lib.fakeHash`, run `nix build`, paste the `got:` hash.
+- The flake only sees git-tracked files: `git add` new files before building.
+- New top-level files the build needs must be added to the `fileset` in
+  `package.nix`.
+
 ## Conventions
 
 - Single-line commit subjects, no body, no Co-Authored-By trailer.
