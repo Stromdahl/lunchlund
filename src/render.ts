@@ -513,8 +513,8 @@ export function render(result: ScrapeResult): string {
 <title>Lunch nära Mobilvägen 10 · ${esc(todayDayName)}</title>
 <meta name="description" content="Dagens lunchmenyer för sex ställen kring Mobilvägen, Ideon.">
 <meta name="theme-color" content="#f7efe1">
-<link rel="alternate" type="application/json" href="https://stromdahl.github.io/lunchlund.json">
-<link rel="alternate" type="application/rss+xml" href="https://stromdahl.github.io/lunchlund.xml" title="Lunchlund · RSS">
+<link rel="alternate" type="application/json" href="https://lunchlund.stromdahl.io/lunchlund.json">
+<link rel="alternate" type="application/rss+xml" href="https://lunchlund.stromdahl.io/lunchlund.xml" title="Lunchlund · RSS">
 <style>${CSS}</style>
 </head>
 <body>
@@ -535,8 +535,8 @@ ${cards}
 <footer class="foot">
 <div class="row">
 <span class="lbl">Feeds</span>
-<a href="https://stromdahl.github.io/lunchlund.json">JSON</a>
-<a href="https://stromdahl.github.io/lunchlund.xml">RSS</a>
+<a href="https://lunchlund.stromdahl.io/lunchlund.json">JSON</a>
+<a href="https://lunchlund.stromdahl.io/lunchlund.xml">RSS</a>
 </div>
 <div class="row">
 <span class="lbl">Källor</span>

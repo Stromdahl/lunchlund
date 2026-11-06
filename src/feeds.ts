@@ -2,10 +2,8 @@ import { ScrapeResult, Restaurant, DayMenu } from "./types";
 import { WEEKDAYS } from "./hours";
 import { isoWeek } from "./week";
 
-// HTML page lives on the project Pages site; feeds are mirrored to the
-// user-level Pages site so the canonical URLs are short.
-const PAGE_URL = "https://stromdahl.github.io/lunchlund";
-const FEED_BASE = "https://stromdahl.github.io";
+// Page and feeds are all served from the radon Site.
+const SITE_URL = "https://lunchlund.stromdahl.io";
 
 function mondayOf(d: Date): Date {
   const m = new Date(d);
@@ -40,8 +38,8 @@ export function renderRss(result: ScrapeResult): string {
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Lunch nära Mobilvägen 10</title>
-    <link>${PAGE_URL}/</link>
-    <atom:link href="${FEED_BASE}/lunchlund.xml" rel="self" type="application/rss+xml" />
+    <link>${SITE_URL}/</link>
+    <atom:link href="${SITE_URL}/lunchlund.xml" rel="self" type="application/rss+xml" />
     <description>Veckans luncher för restaurangerna närmast Mobilvägen 10, Lund.</description>
     <language>sv</language>
     <lastBuildDate>${lastBuild}</lastBuildDate>
@@ -84,7 +82,7 @@ function buildItem(
 
   const xml = `    <item>
       <title>${escapeXml(title)}</title>
-      <link>${PAGE_URL}/#${slug}</link>
+      <link>${SITE_URL}/#${slug}</link>
       <guid isPermaLink="false">${guid}</guid>
       <pubDate>${date.toUTCString()}</pubDate>
       <description>${escapeXml(descHtml)}</description>
