@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Lunchlund (moved)</title>
+    <link>https://lunchlund.stromdahl.io/</link>
+    <description>Lunchlund has moved to lunchlund.stromdahl.io.</description>
+    <atom:link href="https://stromdahl.github.io/lunchlund.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Lunchlund has moved - update your feed</title>
+      <link>https://lunchlund.stromdahl.io/lunchlund.xml</link>
+      <guid isPermaLink="false">lunchlund-moved-2026-11</guid>
+      <pubDate>Fri, 06 Nov 2026 12:00:00 +0000</pubDate>
+      <description>This feed is no longer updated. Subscribe to the new feed at https://lunchlund.stromdahl.io/lunchlund.xml (page: https://lunchlund.stromdahl.io/).</description>
+    </item>
+  </channel>
+</rss>
