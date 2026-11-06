@@ -23,7 +23,6 @@ let
           fsType = "tmpfs";
         };
         system.stateVersion = "26.05";
-        users.groups.caddy = { };
         services.lunchlund = {
           enable = true;
           inherit schedule;
@@ -55,9 +54,17 @@ let
     "output root is not a StateDirectory (DynamicUser would hide it in /var/lib/private)" =
       !(unit ? StateDirectory);
     "service may write the output root" = lib.elem "/var/lib/lunchlund" (asList (unit.ReadWritePaths or [ ]));
-    "output root is created group-owned by the web server group" =
-      lib.any (r: r == "d /var/lib/lunchlund 2770 root caddy - -") rules;
-    "service runs in the web server group" = lib.elem "caddy" (asList (unit.SupplementaryGroups or [ ]));
+    "module creates the dedicated lunchlund group" = config.users.groups ? lunchlund;
+    "output root is group-owned by the lunchlund group" =
+      lib.any (r: r == "d /var/lib/lunchlund 2770 root lunchlund - -") rules;
+    "service runs in the lunchlund group" =
+      lib.elem "lunchlund" (asList (unit.SupplementaryGroups or [ ]));
+    # systemd.exec(5): a static group named like the dynamic user (which
+    # defaults to the unit name) makes DynamicUser demand a static user too.
+    "dynamic user is not named like the static lunchlund group" =
+      (unit.User or "lunchlund") != "lunchlund";
+    "service is not in the web server's group" =
+      !(lib.elem "caddy" (asList (unit.SupplementaryGroups or [ ])));
   };
   failed = lib.attrNames (lib.filterAttrs (_: ok: !ok) checks);
 in

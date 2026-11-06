@@ -43,7 +43,9 @@ page on a systemd timer. It does not configure a web server.
       "Mon..Fri 10:00 Europe/Stockholm"
     ];
   };
-  # Serve config.services.lunchlund.outputDir with your web server.
+  # Serve config.services.lunchlund.outputDir with your web server, and let
+  # it read the output:
+  users.users.caddy.extraGroups = [ "lunchlund" ];
 }
 ```
 
@@ -53,9 +55,11 @@ Options:
 - `schedule` — list of systemd `OnCalendar` expressions; qualify them with a
   timezone. The timer is `Persistent`, so a run missed while the host was
   down happens at boot.
-- `group` (default `"caddy"`) — the web server's group. The output is
-  readable (and writable) by this group only. The group must exist; the
-  module doesn't create it.
+- `group` (default `"lunchlund"`) — a dedicated group the module creates.
+  The output is readable (and writable) by this group only. Give the web
+  server read access by adding its user to it, e.g.
+  `users.users.caddy.extraGroups = [ "lunchlund" ];`. The scraper doesn't
+  join the web server's group, so it can't read the web server's files.
 - `package` (default: this flake's package) — the lunchlund to run.
 - `outputDir` (read-only) — `/var/lib/lunchlund/current`, the directory to
   point the web server at. It holds `index.html`, `lunchlund.json` and

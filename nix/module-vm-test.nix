@@ -1,5 +1,5 @@
 # Runs the real unit in a VM with a stub lunchlund (no network needed): a
-# successful run publishes a page the web server group can read, the next run
+# successful run publishes a page the web server (in the lunchlund group) can read, the next run
 # gets the previous output as --cache, and a failing run leaves `current` as
 # it was. Fail mode is toggled by touching /run/lunchlund-fail. A second node
 # runs the real package under the same sandbox with no network: every scraper
@@ -36,7 +36,6 @@ pkgs.testers.runNixOSTest {
   name = "lunchlund-module";
   nodes.offline = {
     imports = [ module ];
-    users.groups.caddy = { };
     services.lunchlund = {
       enable = true;
       schedule = [ "Mon..Fri 07:15 Europe/Stockholm" ];
@@ -48,6 +47,7 @@ pkgs.testers.runNixOSTest {
     users.users.caddy = {
       isSystemUser = true;
       group = "caddy";
+      extraGroups = [ "lunchlund" ];
     };
     services.lunchlund = {
       enable = true;
@@ -67,8 +67,10 @@ pkgs.testers.runNixOSTest {
         machine.succeed(f"runuser -u caddy -- cat {root}/current/index.html")
         machine.succeed(f"runuser -u caddy -- cat {root}/current/lunchlund.json")
         mode = machine.succeed(f"stat -c '%a %G' {root}/current/ {root}/current/index.html").split()
-        assert mode == ["2770", "caddy", "660", "caddy"], mode
+        assert mode == ["2770", "lunchlund", "660", "lunchlund"], mode
         machine.fail("runuser -u nobody -- ls /var/lib/lunchlund/current")
+        unit_groups = machine.succeed("systemctl show -P SupplementaryGroups lunchlund").split()
+        assert unit_groups == ["lunchlund"], unit_groups
 
     with subtest("next run reads the previous output as cache and drops old builds"):
         first = machine.succeed(f"cat {root}/current/lunchlund.json").strip()

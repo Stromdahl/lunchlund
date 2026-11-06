@@ -13,12 +13,18 @@ let
   # /var/lib/lunchlund to it (systemd.exec(5), "If DynamicUser= is used, the
   # logic for ... StateDirectory= is slightly altered"). A web server user can
   # never traverse that, whatever the file modes. So the output root is a plain
-  # directory made by tmpfiles: root-owned, setgid, group = cfg.group, mode
+  # directory made by tmpfiles: root-owned, setgid, group = cfg.group (a
+  # dedicated static group the module creates, "lunchlund" by default), mode
   # 2770. The unit joins cfg.group and runs with UMask=0007, so everything it
-  # writes is group-readable (the web server reads it) and group-writable (a
-  # later run under a recycled dynamic UID can still delete old builds). Cost:
-  # the web server group can also write here. Don't add StateDirectory=lunchlund
-  # later: systemd would migrate this directory into /var/lib/private.
+  # writes is group-readable and group-writable (a later run under a recycled
+  # dynamic UID can still delete old builds). The web server gets read access
+  # by joining that group on the host:
+  #   users.users.caddy.extraGroups = [ "lunchlund" ];
+  # The scraper deliberately does not join the web server's group: that would
+  # let a compromised scraper read whatever the web server keeps group-readable
+  # (e.g. Caddy's state dir). Cost: the web server can also write here.
+  # Don't add StateDirectory=lunchlund later: systemd would migrate this
+  # directory into /var/lib/private.
   root = "/var/lib/lunchlund";
 
   # Atomic publish: build into a fresh build-XXXXXX dir next to `current`, then
@@ -78,10 +84,11 @@ in
 
     group = lib.mkOption {
       type = lib.types.str;
-      default = "caddy";
+      default = "lunchlund";
       description = ''
-        Group that may read the output: the web server's group. The group must
-        exist on the host; the module does not create it.
+        Dedicated group that owns the output; the module creates it. Add the
+        web server's user to it, e.g.
+        `users.users.caddy.extraGroups = [ "lunchlund" ]`.
       '';
     };
 
@@ -98,6 +105,8 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    users.groups.${cfg.group} = { };
+
     systemd.tmpfiles.rules = [ "d ${root} 2770 root ${cfg.group} - -" ];
 
     systemd.services.lunchlund = {
@@ -109,6 +118,10 @@ in
         Type = "oneshot";
         ExecStart = run;
         DynamicUser = true;
+        # Not "lunchlund": the dynamic user defaults to the unit name, and a
+        # static group of that name makes systemd demand a static user too
+        # (systemd.exec(5), User=), failing the unit with 217/USER.
+        User = "lunchlund-scraper";
         SupplementaryGroups = [ cfg.group ];
         UMask = "0007";
         ReadWritePaths = [ root ];
