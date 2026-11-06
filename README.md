@@ -51,7 +51,8 @@ page on a systemd timer. It does not configure a web server.
 
 Options:
 
-- `enable` — run the service and its timer.
+- `enable` — run the service on its timer, at boot, and whenever a deploy
+  changes it.
 - `schedule` — list of systemd `OnCalendar` expressions; qualify them with a
   timezone. The timer is `Persistent`, so a run missed while the host was
   down happens at boot.
@@ -94,8 +95,8 @@ NixOS config lives in the fleet repo (`projects/fleet`): it imports
 `nixosModules.default` from this flake, enables `services.lunchlund` with a
 timer Mon-Fri 07:15 and 10:00 Europe/Stockholm, and serves `outputDir` as the
 Site `lunchlund.stromdahl.io`. To ship a change, push here, then bump the
-`lunchlund` flake input in the fleet repo and deploy radon. To refresh the menus
-immediately: `systemctl start lunchlund` on radon.
+`lunchlund` flake input in the fleet repo and deploy radon; the deploy rebuilds
+the page. To refresh the menus by hand: `systemctl start lunchlund` on radon.
 
 CI (`.github/workflows/nix.yml`) runs `nix build` on every push; its
 `checkPhase` runs `yarn test`. There is no GitHub Pages deploy and no scheduled

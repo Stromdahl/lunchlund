@@ -46,6 +46,7 @@ let
     "service sets PrivateTmp" = (unit.PrivateTmp or false) == true;
     "service protects the system" = lib.elem (unit.ProtectSystem or null) [ "strict" "full" true ];
     "service protects home" = lib.elem (unit.ProtectHome or null) [ "read-only" "tmpfs" true ];
+    "service runs at boot and on deploy" = lib.elem "multi-user.target" (service.wantedBy or [ ]);
     "timer is Persistent" = (timer.Persistent or false) == true;
     "timer fires on the given schedule" = lib.toList (timer.OnCalendar or [ ]) == schedule;
     "timer is enabled at boot" = lib.elem "timers.target" ((config.systemd.timers.lunchlund or { }).wantedBy or [ ]);

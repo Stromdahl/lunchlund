@@ -111,6 +111,10 @@ in
 
     systemd.services.lunchlund = {
       description = "Rebuild the lunchlund lunch-menu page";
+      # Also run at boot and whenever a deploy changes the unit, so a fresh host
+      # or a new lunchlund version gets a page without waiting for the timer.
+      # A failed run leaves the previous page in place, so this is safe.
+      wantedBy = [ "multi-user.target" ];
       wants = [ "network-online.target" ];
       after = [ "network-online.target" ];
       path = [ pkgs.coreutils ];
