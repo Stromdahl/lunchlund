@@ -38,7 +38,7 @@ let
   # makes it 0700, and chmod can't fix that because DynamicUser implies
   # RestrictSUIDSGID, which refuses any chmod carrying the inherited setgid
   # bit. mkdir under UMask=0007 gives 0770 and inherits setgid + group itself.
-  run = pkgs.writeShellScript "lunchlund-run" ''
+  publish = pkgs.writeShellScript "lunchlund-publish" ''
     set -euo pipefail
     root=${root}
     tmp=$(mktemp -u "$root/build-XXXXXX")
@@ -116,7 +116,7 @@ in
       path = [ pkgs.coreutils ];
       serviceConfig = {
         Type = "oneshot";
-        ExecStart = run;
+        ExecStart = publish;
         DynamicUser = true;
         # Not "lunchlund": the dynamic user defaults to the unit name, and a
         # static group of that name makes systemd demand a static user too
