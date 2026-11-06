@@ -1,7 +1,10 @@
 # Runs the real unit in a VM with a stub lunchlund (no network needed): a
 # successful run publishes a page the web server group can read, the next run
 # gets the previous output as --cache, and a failing run leaves `current` as
-# it was. Fail mode is toggled by touching /run/lunchlund-fail.
+# it was. Fail mode is toggled by touching /run/lunchlund-fail. A second node
+# runs the real package under the same sandbox with no network: every scraper
+# fails, yet the run succeeds and publishes error cards (no-network is not a
+# failed run).
 { pkgs, module }:
 let
   stub = pkgs.writeShellApplication {
@@ -31,6 +34,14 @@ let
 in
 pkgs.testers.runNixOSTest {
   name = "lunchlund-module";
+  nodes.offline = {
+    imports = [ module ];
+    users.groups.caddy = { };
+    services.lunchlund = {
+      enable = true;
+      schedule = [ "Mon..Fri 07:15 Europe/Stockholm" ];
+    };
+  };
   nodes.machine = {
     imports = [ module ];
     users.groups.caddy = { };
@@ -46,6 +57,7 @@ pkgs.testers.runNixOSTest {
   };
   testScript = ''
     root = "/var/lib/lunchlund"
+    start_all()
     machine.wait_for_unit("multi-user.target")
 
     with subtest("first run publishes a page the web server can read"):
@@ -75,5 +87,11 @@ pkgs.testers.runNixOSTest {
         builds = machine.succeed(f"ls -d {root}/build-* | wc -l").strip()
         assert builds == "1", builds
         machine.fail(f"test -e {root}/current.new")
+
+    with subtest("the real package runs in the sandbox and publishes error cards offline"):
+        offline.wait_for_unit("multi-user.target")
+        offline.succeed("systemctl start lunchlund")
+        offline.succeed(f"grep -q 'Kunde inte hämta menyn' {root}/current/index.html")
+        offline.succeed(f"test -s {root}/current/lunchlund.json -a -s {root}/current/lunchlund.xml")
   '';
 }
