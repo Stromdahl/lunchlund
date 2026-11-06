@@ -3,7 +3,7 @@ import { WEEKDAYS } from "./hours";
 import { isoWeek } from "./week";
 
 // Page and feeds are all served from the radon Site.
-const SITE_URL = "https://lunchlund.stromdahl.io";
+export const SITE_URL = "https://lunchlund.stromdahl.io";
 
 function mondayOf(d: Date): Date {
   const m = new Date(d);
