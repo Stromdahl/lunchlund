@@ -12,3 +12,7 @@ dist-js/
 !.yarn/sdks
 !.yarn/versions
 .pnp.*
+
+# Nix
+result
+result-*
